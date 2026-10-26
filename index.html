@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ray — машинное зрение для контроля качества</title>
+  <meta name="description" content="Человек пропускает до 30% микродефектов из-за усталости. Цифровой глаз Ray проверяет 100% деталей 24/7. Пройдите тест «Человек vs ИИ» и посчитайте свои потери от брака.">
+  <meta property="og:title" content="Ваши глаза — самое слабое звено в контроле качества">
+  <meta property="og:description" content="Пройдите тест «Человек vs ИИ» и посчитайте, сколько вы теряете на пропущенном браке.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#0b0e13">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b0e13'/%3E%3Cpath d='M4 16c3-6 7.5-9 12-9s9 3 12 9c-3 6-7.5 9-12 9s-9-3-12-9z' fill='none' stroke='%232ee6a8' stroke-width='2.4'/%3E%3Ccircle cx='16' cy='16' r='4.5' fill='%232ee6a8'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Общие SVG-определения: металл, ржавчина, деталь-фланец -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <radialGradient id="m0" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="#eef1f5"/><stop offset=".55" stop-color="#9ca6b3"/><stop offset="1" stop-color="#58616d"/></radialGradient>
+    <radialGradient id="m1" cx="40%" cy="35%" r="80%"><stop offset="0" stop-color="#e3e7ec"/><stop offset=".5" stop-color="#939daa"/><stop offset="1" stop-color="#525a66"/></radialGradient>
+    <radialGradient id="m2" cx="30%" cy="40%" r="85%"><stop offset="0" stop-color="#f4f6f8"/><stop offset=".6" stop-color="#a5aeba"/><stop offset="1" stop-color="#606a76"/></radialGradient>
+    <radialGradient id="rust"><stop offset="0" stop-color="#b8692a" stop-opacity=".75"/><stop offset=".6" stop-color="#a4581f" stop-opacity=".35"/><stop offset="1" stop-color="#a4581f" stop-opacity="0"/></radialGradient>
+    <symbol id="flange" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="42" fill="url(#m0)"/>
+      <circle cx="50" cy="50" r="41.5" fill="none" stroke="rgba(255,255,255,.3)"/>
+      <circle cx="50" cy="50" r="33" fill="none" stroke="rgba(0,0,0,.22)"/>
+      <g fill="#151b23" stroke="rgba(0,0,0,.45)" stroke-width="1">
+        <circle cx="75" cy="50" r="4.5"/><circle cx="62.5" cy="71.65" r="4.5"/><circle cx="37.5" cy="71.65" r="4.5"/>
+        <circle cx="25" cy="50" r="4.5"/><circle cx="37.5" cy="28.35" r="4.5"/><circle cx="62.5" cy="28.35" r="4.5"/>
+      </g>
+      <circle cx="50" cy="50" r="11" fill="#151b23" stroke="rgba(0,0,0,.5)" stroke-width="2"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="header" id="top">
+  <div class="container header__inner">
+    <a class="logo" href="index.html" aria-label="Ray — на главную">
+      <img src="assets/ray_logo_rus.svg" alt="Ray" width="97" height="36">
+    </a>
+    <nav class="dirnav" aria-label="Направления">
+      <a href="index.html" aria-current="page">Детекция брака</a>
+      <a href="tracking.html">Трекинг объектов</a>
+      <a href="motion.html">Поиск движения</a>
+      <a href="counting.html">Подсчёт объектов</a>
+    </nav>
+    <a class="btn btn--sm btn--ghost header__cta" href="#form">Бесплатный тест</a>
+  </div>
+</header>
+
+<main>
+
+  <!-- 1. HERO -->
+  <section class="hero">
+    <div class="container hero__grid">
+      <div class="hero__text">
+        <p class="kicker">Машинное зрение для контроля качества</p>
+        <h1>Ваши глаза — <em>самое слабое звено</em> в&nbsp;контроле качества</h1>
+        <p class="lead">Человек пропускает до 30% микродефектов из‑за усталости. Наш ИИ видит 100% объектов 24/7.</p>
+        <div class="hero__cta">
+          <a class="btn btn--primary btn--lg" href="#test">Пройти тест: Человек vs ИИ</a>
+          <a class="btn btn--ghost btn--lg" href="#calc">Посчитать потери</a>
+        </div>
+        <ul class="hero__facts">
+          <li><b>48 ч</b> на интеграцию в линию</li>
+          <li><b>0,03 с</b> на проверку детали</li>
+          <li><b>10 фото</b> — и бесплатный тест</li>
+        </ul>
+      </div>
+
+      <figure class="hero__visual" aria-label="Слева — уставший контролёр на 8-м часу смены, справа — интерфейс машинного зрения с подсвеченными дефектами">
+        <svg viewBox="0 0 800 500" role="img" aria-hidden="true">
+          <defs>
+            <linearGradient id="warm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2d241d"/><stop offset="1" stop-color="#15110e"/></linearGradient>
+            <linearGradient id="cold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a1a22"/><stop offset="1" stop-color="#061015"/></linearGradient>
+            <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="rgba(46,230,168,.09)"/></pattern>
+            <linearGradient id="scan" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2ee6a8" stop-opacity="0"/><stop offset="1" stop-color="#2ee6a8" stop-opacity=".35"/></linearGradient>
+            <clipPath id="clipL"><rect width="398" height="500"/></clipPath>
+            <clipPath id="clipR"><rect x="402" width="398" height="500"/></clipPath>
+          </defs>
+
+          <!-- Левая половина: человек -->
+          <g clip-path="url(#clipL)">
+            <rect width="398" height="500" fill="url(#warm)"/>
+            <polygon points="205,0 80,360 330,360" fill="rgba(255,190,110,.06)"/>
+            <g transform="translate(330 72)" opacity=".8">
+              <circle r="26" fill="#1c1612" stroke="#7a6a5a" stroke-width="2"/>
+              <line y2="-15" stroke="#c9b9a6" stroke-width="2.5" stroke-linecap="round" transform="rotate(100)"/>
+              <line y2="-20" stroke="#c9b9a6" stroke-width="2" stroke-linecap="round" transform="rotate(282)"/>
+            </g>
+            <text x="330" y="118" text-anchor="middle" class="svg-mono" fill="#a8968a" font-size="13">03:47</text>
+            <!-- оператор -->
+            <path d="M95 500C100 405 150 365 200 365s100 40 105 135z" fill="#3a4656"/>
+            <path d="M175 365h50l-6-38h-38z" fill="#b5826a"/>
+            <g transform="rotate(-13 205 290)">
+              <circle cx="205" cy="292" r="48" fill="#c8957a"/>
+              <path d="M155 278c0-38 22-58 50-58s50 20 50 58c-8-6-14-6-20-6h-60c-6 0-12 0-20 6z" fill="#d9a520" opacity=".85"/>
+              <rect x="150" y="270" width="110" height="9" rx="4.5" fill="#b8891a" opacity=".9"/>
+              <path d="M180 296q9 6 18 0M214 296q9 6 18 0" fill="none" stroke="#3a2418" stroke-width="3" stroke-linecap="round"/>
+              <path d="M181 305q8 4 16 0M215 305q8 4 16 0" fill="none" stroke="rgba(110,60,50,.55)" stroke-width="2" stroke-linecap="round"/>
+              <path d="M196 322q10-3 20 2" fill="none" stroke="#7a4a3a" stroke-width="2.5" stroke-linecap="round"/>
+            </g>
+            <path d="M300 500C300 430 280 380 240 345" fill="none" stroke="#344050" stroke-width="34" stroke-linecap="round"/>
+            <circle cx="238" cy="338" r="17" fill="#c08a70"/>
+            <g class="zzz" fill="#ffb020" font-weight="800">
+              <text x="268" y="232" font-size="22">z</text><text x="286" y="210" font-size="17">z</text><text x="300" y="192" font-size="13">z</text>
+            </g>
+            <!-- конвейер -->
+            <rect y="430" width="398" height="70" fill="#1d1814"/>
+            <rect y="430" width="398" height="5" fill="#3a3028"/>
+            <g class="belt">
+              <use href="#flange" x="10" y="440" width="48" height="48"/>
+              <use href="#flange" x="110" y="440" width="48" height="48"/>
+              <g><use href="#flange" x="210" y="440" width="48" height="48"/><path d="M252 456l-8 4 3 5-7 3" stroke="#1a1d22" stroke-width="1.3" fill="none"/></g>
+              <use href="#flange" x="310" y="440" width="48" height="48"/>
+              <use href="#flange" x="410" y="440" width="48" height="48"/>
+              <use href="#flange" x="510" y="440" width="48" height="48"/>
+            </g>
+            <g class="svg-mono" font-size="12">
+              <rect x="16" y="16" width="148" height="26" rx="6" fill="rgba(0,0,0,.45)"/>
+              <text x="28" y="33" fill="#c9b9a6">Смена: 7 ч 40 мин</text>
+              <rect x="16" y="50" width="148" height="26" rx="6" fill="rgba(255,176,32,.14)"/>
+              <text x="28" y="67" fill="#ffb020">Внимание ▼ 40%</text>
+            </g>
+          </g>
+
+          <!-- Правая половина: ИИ -->
+          <g clip-path="url(#clipR)">
+            <rect x="402" width="398" height="500" fill="url(#cold)"/>
+            <rect x="402" width="398" height="500" fill="url(#grid)"/>
+            <g class="svg-mono" font-size="12">
+              <circle cx="424" cy="29" r="5" fill="#ff4d4f" class="blink"/>
+              <text x="436" y="33" fill="#cfe9e1">LIVE · CAM‑02</text>
+              <text x="782" y="33" fill="#7fa79b" text-anchor="end">0,03 с / деталь</text>
+            </g>
+            <!-- крупный план -->
+            <use href="#flange" x="425" y="130" width="110" height="110"/>
+            <path d="M509 152l-10 9 5 6-9 7 4 5" stroke="#161a1f" stroke-width="1.6" fill="none"/>
+            <rect x="488" y="140" width="34" height="42" fill="none" stroke="#ff4d4f" stroke-width="2"/>
+            <rect x="488" y="122" width="108" height="18" fill="#ff4d4f"/>
+            <text x="493" y="135" class="svg-mono" font-size="11" fill="#fff">Микротрещина 98%</text>
+
+            <use href="#flange" x="545" y="130" width="110" height="110"/>
+            <circle cx="642" cy="200" r="8" fill="#0a1a22"/>
+            <rect x="626" y="184" width="30" height="32" fill="none" stroke="#ff4d4f" stroke-width="2"/>
+            <rect x="626" y="216" width="66" height="18" fill="#ff4d4f"/>
+            <text x="631" y="229" class="svg-mono" font-size="11" fill="#fff">Скол 96%</text>
+
+            <use href="#flange" x="665" y="130" width="110" height="110"/>
+            <rect x="672" y="137" width="96" height="96" fill="none" stroke="#2ee6a8" stroke-width="1.5" stroke-dasharray="6 4"/>
+            <rect x="672" y="119" width="30" height="18" fill="#2ee6a8"/>
+            <text x="678" y="132" class="svg-mono" font-size="11" fill="#06281d">OK</text>
+
+            <g class="svg-mono" font-size="12">
+              <rect x="420" y="282" width="362" height="88" rx="10" fill="rgba(46,230,168,.06)" stroke="rgba(46,230,168,.25)"/>
+              <text x="436" y="308" fill="#7fa79b">Проверено за смену</text><text x="766" y="308" fill="#e8f5f0" text-anchor="end">18 432</text>
+              <text x="436" y="332" fill="#7fa79b">Отбраковано</text><text x="766" y="332" fill="#ff7a7b" text-anchor="end">37</text>
+              <text x="436" y="356" fill="#7fa79b">Внимание</text><text x="766" y="356" fill="#2ee6a8" text-anchor="end">100% · без перерывов</text>
+            </g>
+            <rect x="402" y="430" width="398" height="70" fill="#07151b"/>
+            <rect x="402" y="430" width="398" height="5" fill="#123038"/>
+            <g class="belt">
+              <use href="#flange" x="412" y="440" width="48" height="48"/>
+              <use href="#flange" x="512" y="440" width="48" height="48"/>
+              <g><use href="#flange" x="612" y="440" width="48" height="48"/><rect x="636" y="446" width="20" height="22" fill="none" stroke="#ff4d4f" stroke-width="1.6"/></g>
+              <use href="#flange" x="712" y="440" width="48" height="48"/>
+              <use href="#flange" x="812" y="440" width="48" height="48"/>
+              <use href="#flange" x="912" y="440" width="48" height="48"/>
+            </g>
+            <rect class="scanbar" x="402" y="0" width="80" height="430" fill="url(#scan)"/>
+          </g>
+
+          <line x1="400" y1="0" x2="400" y2="500" stroke="#0b0e13" stroke-width="4"/>
+          <circle cx="400" cy="250" r="26" fill="#0b0e13" stroke="#2a3443" stroke-width="2"/>
+          <text x="400" y="256" text-anchor="middle" font-weight="800" font-size="16" fill="#e8edf3">VS</text>
+        </svg>
+        <figcaption class="hero__caption">
+          <span>Человек · 8‑й час смены</span>
+          <span>ИИ · 8‑й час смены — так же точно</span>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 2. ЧЕЛЛЕНДЖ -->
+  <section class="section" id="test">
+    <div class="container">
+      <header class="section__head">
+        <p class="kicker">Интерактивный тест · 15 секунд</p>
+        <h2>Человек vs ИИ: найдите брак быстрее, чем уедет конвейер</h2>
+        <p class="section__sub">Перед вами 40 фланцев. Среди них <b>10 бракованных</b>: микротрещины, сколы, царапины, пятна и недосверленные отверстия. Нажимайте на детали с дефектами.</p>
+      </header>
+
+      <div class="game" id="game">
+        <div class="game__bar">
+          <div class="stat"><span class="stat__label">Осталось</span><span class="stat__value mono" id="g-timer">15,0 с</span></div>
+          <div class="stat"><span class="stat__label">Отмечено</span><span class="stat__value mono" id="g-marked">0</span></div>
+          <div class="stat"><span class="stat__label">Нужно найти</span><span class="stat__value mono">10</span></div>
+          <button class="btn btn--sm btn--ghost game__done" id="g-done" type="button" disabled>Готово</button>
+        </div>
+        <div class="game__progress"><span id="g-progress"></span></div>
+
+        <div class="board-wrap">
+          <div class="board" id="board" aria-label="Поле с деталями"></div>
+          <div class="scanline" id="scanline" aria-hidden="true"></div>
+          <div class="board__start" id="g-start">
+            <p class="board__start-title">Готовы проверить свою внимательность?</p>
+            <p class="board__start-sub">Время пойдёт сразу после нажатия</p>
+            <button class="btn btn--primary btn--lg" id="g-start-btn" type="button">Начать тест</button>
+          </div>
+        </div>
+
+        <div class="result" id="g-result" hidden aria-live="polite">
+          <div class="result__score">
+            <div class="score score--human"><span>Ваш результат</span><b class="mono" id="r-human">6/10</b></div>
+            <div class="score score--ai"><span>Результат ИИ</span><b class="mono">10/10</b></div>
+          </div>
+          <p class="result__copy" id="r-copy"></p>
+          <p class="result__extra" id="r-extra"></p>
+          <ul class="legend">
+            <li><i class="dot dot--hit"></i>Вы нашли</li>
+            <li><i class="dot dot--miss"></i>Вы пропустили — нашёл ИИ</li>
+            <li><i class="dot dot--false"></i>Ложная тревога</li>
+          </ul>
+          <div class="result__cta">
+            <a class="btn btn--primary" href="#calc">Посчитать, сколько это стоит</a>
+            <button class="btn btn--ghost" id="g-again" type="button">Пройти ещё раз</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. БОЛИ -->
+  <section class="section section--alt" id="why">
+    <div class="container">
+      <header class="section__head">
+        <p class="kicker">Дело не в квалификации</p>
+        <h2>Почему люди проигрывают?</h2>
+        <p class="section__sub">Это физиология, а не халатность. Даже лучший контролёр — человек, а не камера.</p>
+      </header>
+      <div class="cards3">
+        <article class="pain">
+          <div class="pain__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7v5l3 2"/><circle cx="12" cy="12" r="9"/></svg></div>
+          <h3>Усталость</h3>
+          <p>Через 30 минут монотонной работы концентрация падает на&nbsp;40%. К концу смены глаз «замыливается».</p>
+          <div class="pain__metric"><span class="mono">−40%</span> внимания через 30 мин</div>
+        </article>
+        <article class="pain">
+          <div class="pain__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M5 7h14M5 7l-3 7a3 3 0 0 0 6 0zM19 7l-3 7a3 3 0 0 0 6 0z"/></svg></div>
+          <h3>Субъективность</h3>
+          <p>Один контролёр считает это браком, другой — нормой. Критерии «плывут» от смены к смене.</p>
+          <div class="pain__metric"><span class="mono">2 мнения</span> на одну деталь</div>
+        </article>
+        <article class="pain">
+          <div class="pain__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 3L4 14h7l-1 7 9-11h-7z"/></svg></div>
+          <h3>Скорость</h3>
+          <p>Человеческий глаз не успевает за конвейером, работающим быстрее 60 деталей в минуту.</p>
+          <div class="pain__metric"><span class="mono">&gt;60</span> деталей/мин — предел</div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. КАК РАБОТАЕТ -->
+  <section class="section" id="how">
+    <div class="container">
+      <header class="section__head">
+        <p class="kicker">Технология простыми словами</p>
+        <h2>Цифровой глаз, который не моргает</h2>
+        <p class="section__sub">Мы не заменяем ваших людей. Мы снимаем с них рутину и исключаем ошибки — а контролёры занимаются тем, где нужен опыт.</p>
+      </header>
+
+      <ol class="flow">
+        <li class="flow__step">
+          <div class="flow__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h2l2-2h6l2 2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+          <span class="flow__n mono">01</span>
+          <h3>Камера</h3>
+          <p>Фотографирует каждую деталь прямо на конвейере — без остановки линии.</p>
+        </li>
+        <li class="flow__arrow" aria-hidden="true"></li>
+        <li class="flow__step flow__step--ai">
+          <div class="flow__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4a3 3 0 0 0-3 3 3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 6 1V5a2 2 0 0 0-3-1zM15 4a3 3 0 0 1 3 3 3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-6 1"/></svg></div>
+          <span class="flow__n mono">02</span>
+          <h3>Мозг (ИИ)</h3>
+          <p>Сравнивает снимок с тысячами примеров годных и бракованных деталей за сотые доли секунды.</p>
+        </li>
+        <li class="flow__arrow" aria-hidden="true"></li>
+        <li class="flow__step">
+          <div class="flow__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <span class="flow__n mono">03</span>
+          <h3>Решение</h3>
+          <p>Отбраковка толкателем, сигнал оператору или остановка линии — как удобно вам.</p>
+        </li>
+      </ol>
+
+      <ul class="benefits">
+        <li>
+          <h3>«Видит» то, что не видит глаз</h3>
+          <p>Микротрещины, отклонения в цвете, неполная комплектация — дефекты размером в доли миллиметра.</p>
+        </li>
+        <li>
+          <h3>Интеграция в любую линию за 48 часов</h3>
+          <p>Камеры ставятся на существующий конвейер. Перестраивать производство не нужно.</p>
+        </li>
+        <li>
+          <h3>Без обеда, отпусков и больничных</h3>
+          <p>Одинаковая точность в 9 утра и в 4 часа ночи. Каждая смена — как первая.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 5. КАЛЬКУЛЯТОР -->
+  <section class="section section--alt" id="calc">
+    <div class="container">
+      <header class="section__head">
+        <p class="kicker">6 вопросов · 1 минута</p>
+        <h2>Сколько вы теряете на браке прямо сейчас?</h2>
+        <p class="section__sub">Укажите консервативные значения — результат всё равно обычно оказывается неприятным.</p>
+      </header>
+
+      <div class="calc">
+        <form class="calc__questions" id="calc-form" onsubmit="return false">
+          <div class="q">
+            <span class="q__n mono">1</span>
+            <div class="q__body">
+              <label class="q__title" for="n-units">Сколько единиц продукции вы выпускаете в день?</label>
+              <div class="q__ctrl" data-field="units">
+                <input type="range" min="100" max="20000" step="100" value="2000" aria-label="Выпуск в день, ползунок">
+                <div class="num"><input id="n-units" type="number" min="1" step="1" value="2000" inputmode="numeric"><span>шт.</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="q">
+            <span class="q__n mono">2</span>
+            <div class="q__body">
+              <label class="q__title" for="n-days">Сколько рабочих дней в месяце работает производство?</label>
+              <div class="q__ctrl" data-field="days">
+                <input type="range" min="20" max="30" step="1" value="22" aria-label="Рабочие дни, ползунок">
+                <div class="num"><input id="n-days" type="number" min="1" max="31" step="1" value="22" inputmode="numeric"><span>дн.</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="q">
+            <span class="q__n mono">3</span>
+            <div class="q__body">
+              <label class="q__title" for="n-defect">Какой процент продукции уходит в брак или требует переделки?</label>
+              <div class="q__ctrl" data-field="defect">
+                <input type="range" min="0.1" max="10" step="0.1" value="2" aria-label="Процент брака, ползунок">
+                <div class="num"><input id="n-defect" type="number" min="0" max="100" step="0.1" value="2" inputmode="decimal"><span>%</span></div>
+              </div>
+              <p class="q__hint">Не знаете точно? Оставьте среднее по отрасли или <a href="#form">запросите бесплатный аудит</a>.</p>
+            </div>
+          </div>
+          <div class="q">
+            <span class="q__n mono">4</span>
+            <div class="q__body">
+              <label class="q__title" for="n-share">Какая часть этого брака уходит клиенту, а не задерживается внутри?</label>
+              <div class="q__ctrl" data-field="share">
+                <input type="range" min="0" max="100" step="5" value="30" aria-label="Доля брака у клиента, ползунок">
+                <div class="num"><input id="n-share" type="number" min="0" max="100" step="1" value="30" inputmode="numeric"><span>%</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="q">
+            <span class="q__n mono">5</span>
+            <div class="q__body">
+              <label class="q__title" for="n-price">Средняя стоимость одной единицы продукции?</label>
+              <div class="q__ctrl" data-field="price">
+                <input type="range" min="10" max="20000" step="10" value="800" aria-label="Стоимость единицы, ползунок">
+                <div class="num"><input id="n-price" type="number" min="0" step="1" value="800" inputmode="numeric"><span>₽</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="q">
+            <span class="q__n mono">6</span>
+            <div class="q__body">
+              <label class="q__title" for="n-ret">Сколько в среднем стоит обработка одного возврата или рекламации?</label>
+              <div class="q__ctrl" data-field="ret">
+                <input type="range" min="0" max="10000" step="100" value="1200" aria-label="Стоимость возврата, ползунок">
+                <div class="num"><input id="n-ret" type="number" min="0" step="1" value="1200" inputmode="numeric"><span>₽</span></div>
+              </div>
+              <p class="q__hint">Логистика, замена, сервис, штрафы и время сотрудников. Обычно 1 000–3 000 ₽.</p>
+            </div>
+          </div>
+          <div class="q q--scenario">
+            <span class="q__n mono">%</span>
+            <div class="q__body">
+              <span class="q__title" id="sc-label">Какую долю брака система будет предотвращать?</span>
+              <div class="seg" role="radiogroup" aria-labelledby="sc-label">
+                <label><input type="radio" name="sc" value="50"><span>Осторожно · 50%</span></label>
+                <label><input type="radio" name="sc" value="70" checked><span>Реалистично · 70%</span></label>
+                <label><input type="radio" name="sc" value="90"><span>Амбициозно · 90%</span></label>
+              </div>
+            </div>
+          </div>
+        </form>
+
+        <aside class="calc__result" aria-live="polite">
+          <p class="res__label">Вы теряете примерно</p>
+          <p class="res__big mono" id="c-month">—</p>
+          <p class="res__note">в месяц из‑за брака и рекламаций</p>
+
+          <div class="res__row">
+            <p>За год это <b class="mono" id="c-year">—</b> — без учёта штрафов, простоев и потери клиентов.</p>
+          </div>
+          <div class="res__save">
+            <p>Если система предотвратит <b id="c-pct">70%</b> таких случаев, вы сохраните до</p>
+            <p class="res__save-val mono" id="c-save">—</p>
+            <p class="res__note">в год (потенциальная экономия)</p>
+          </div>
+
+          <ul class="res__human">
+            <li>≈ <b class="mono" id="c-returns">—</b> <span id="c-returns-w">возвратов</span> клиентов в месяц</li>
+            <li>≈ <b class="mono" id="c-hours">—</b> <span id="c-hours-w">часов</span> работы контролёров на разбор рекламаций<sup>*</sup></li>
+            <li>стоимость <b class="mono" id="c-units">—</b> <span id="c-units-w">единиц</span> продукции, которые можно было бы продать</li>
+          </ul>
+
+          <details class="res__formula" open>
+            <summary>Как мы посчитали</summary>
+            <ol id="c-formula" class="mono"></ol>
+          </details>
+
+          <p class="res__honest">Это не прогноз продаж, а оценка текущих потерь от человеческого фактора и пропущенных дефектов.</p>
+          <p class="res__next">Хотите проверить эти цифры на 10 реальных фото вашей продукции? Пришлите их — покажем, что смог бы найти ИИ.</p>
+          <a class="btn btn--primary btn--block" href="#form" id="c-cta">Получить расчёт для моего производства</a>
+          <p class="disclaimer">Расчёт является оценочным и не учитывает специфику продукции, стоимость внедрения и текущие процессы контроля. *Из расчёта ~1,5 ч на разбор одной рекламации.</p>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. КЕЙСЫ -->
+  <section class="section" id="cases">
+    <div class="container">
+      <header class="section__head">
+        <p class="kicker">Примеры дефектов</p>
+        <h2>Потяните ползунок — посмотрите глазами ИИ</h2>
+        <p class="section__sub">Слева — как деталь видит человек. Справа — что находит система.</p>
+      </header>
+
+      <div class="tabs" role="tablist" aria-label="Примеры">
+        <button role="tab" aria-selected="true" data-case="metal">Царапина на металле</button>
+        <button role="tab" aria-selected="false" data-case="glass">Скол на стекле</button>
+        <button role="tab" aria-selected="false" data-case="pack">Нет детали в упаковке</button>
+      </div>
+
+      <div class="ba" id="ba">
+        <!-- Металл -->
+        <div class="ba__case" data-case="metal">
+          <svg class="ba__img" viewBox="0 0 800 450" aria-label="Шлифованная металлическая пластина">
+            <defs>
+              <filter id="brushed" x="0" y="0" width="100%" height="100%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.002 0.55" numOctaves="2" seed="4"/>
+                <feColorMatrix type="matrix" values="0 0 0 0 .6  0 0 0 0 .63  0 0 0 0 .67  0 0 0 .55 0"/>
+              </filter>
+              <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#cfd5dc"/><stop offset=".5" stop-color="#9aa3ad"/><stop offset="1" stop-color="#7d8792"/></linearGradient>
+            </defs>
+            <rect width="800" height="450" fill="#2a3038"/>
+            <rect x="60" y="45" width="680" height="360" rx="14" fill="url(#steel)"/>
+            <rect x="60" y="45" width="680" height="360" rx="14" filter="url(#brushed)" opacity=".9"/>
+            <circle cx="110" cy="95" r="14" fill="#2a3038" stroke="#69727c" stroke-width="3"/>
+            <circle cx="690" cy="95" r="14" fill="#2a3038" stroke="#69727c" stroke-width="3"/>
+            <circle cx="110" cy="355" r="14" fill="#2a3038" stroke="#69727c" stroke-width="3"/>
+            <circle cx="690" cy="355" r="14" fill="#2a3038" stroke="#69727c" stroke-width="3"/>
+            <path d="M432 168 C452 190 470 214 498 246" stroke="rgba(255,255,255,.55)" stroke-width="1.2" fill="none"/>
+            <path d="M433 170 C453 192 471 216 499 248" stroke="rgba(40,46,54,.45)" stroke-width="1" fill="none"/>
+          </svg>
+          <div class="ba__ai">
+            <svg viewBox="0 0 800 450" aria-hidden="true">
+              <rect width="800" height="450" fill="rgba(4,14,18,.45)"/>
+              <rect width="800" height="450" fill="url(#grid)"/>
+              <ellipse cx="466" cy="208" rx="70" ry="52" fill="#ff4d4f" opacity=".22" style="filter:blur(14px)"/>
+              <path d="M432 168 C452 190 470 214 498 246" stroke="#ff4d4f" stroke-width="2.5" fill="none"/>
+              <rect x="412" y="150" width="108" height="114" fill="none" stroke="#ff4d4f" stroke-width="2.5"/>
+              <rect x="412" y="120" width="226" height="30" fill="#ff4d4f"/>
+              <text x="422" y="141" class="svg-mono" font-size="16" fill="#fff">Царапина 0,4 мм · 98,7%</text>
+            </svg>
+          </div>
+        </div>
+        <!-- Стекло -->
+        <div class="ba__case" data-case="glass" hidden>
+          <svg class="ba__img" viewBox="0 0 800 450" aria-label="Стеклянная панель">
+            <defs>
+              <linearGradient id="glassBg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b2a33"/><stop offset="1" stop-color="#0d151b"/></linearGradient>
+              <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#bfe3ee" stop-opacity=".35"/><stop offset=".5" stop-color="#7fb7c9" stop-opacity=".18"/><stop offset="1" stop-color="#bfe3ee" stop-opacity=".3"/></linearGradient>
+            </defs>
+            <rect width="800" height="450" fill="url(#glassBg)"/>
+            <path d="M120 70H680a20 20 0 0 1 20 20V360a20 20 0 0 1-20 20H120a20 20 0 0 1-20-20V90a20 20 0 0 1 20-20z" fill="url(#glass)" stroke="rgba(220,245,255,.55)" stroke-width="2"/>
+            <path d="M160 100l170 0-110 250h-60z" fill="rgba(255,255,255,.06)"/>
+            <path d="M560 100l60 0-80 250h-30z" fill="rgba(255,255,255,.05)"/>
+            <path d="M700 205l-9 4-4 9 5 8-5 6 13 4z" fill="#0f1a20" stroke="rgba(230,250,255,.7)" stroke-width="1"/>
+            <path d="M690 212l-14 -6M688 222l-12 4" stroke="rgba(230,250,255,.35)" stroke-width=".8"/>
+          </svg>
+          <div class="ba__ai">
+            <svg viewBox="0 0 800 450" aria-hidden="true">
+              <rect width="800" height="450" fill="rgba(4,14,18,.45)"/>
+              <rect width="800" height="450" fill="url(#grid)"/>
+              <ellipse cx="692" cy="218" rx="40" ry="38" fill="#ff4d4f" opacity=".28" style="filter:blur(10px)"/>
+              <rect x="664" y="190" width="54" height="56" fill="none" stroke="#ff4d4f" stroke-width="2.5"/>
+              <rect x="448" y="246" width="270" height="30" fill="#ff4d4f"/>
+              <text x="458" y="267" class="svg-mono" font-size="16" fill="#fff">Скол кромки 1,2 мм · 96,4%</text>
+            </svg>
+          </div>
+        </div>
+        <!-- Упаковка -->
+        <div class="ba__case" data-case="pack" hidden>
+          <svg class="ba__img" viewBox="0 0 800 450" aria-label="Блистерная упаковка с деталями">
+            <defs>
+              <radialGradient id="cell" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#ffffff" stop-opacity=".55"/><stop offset="1" stop-color="#cfd8e0" stop-opacity=".15"/></radialGradient>
+              <linearGradient id="nut" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f2c04c"/><stop offset="1" stop-color="#a87a14"/></linearGradient>
+            </defs>
+            <rect width="800" height="450" fill="#232a33"/>
+            <rect x="110" y="55" width="580" height="340" rx="18" fill="#dfe5ea"/>
+            <g id="pack-cells"></g>
+          </svg>
+          <div class="ba__ai">
+            <svg viewBox="0 0 800 450" aria-hidden="true">
+              <rect width="800" height="450" fill="rgba(4,14,18,.45)"/>
+              <rect width="800" height="450" fill="url(#grid)"/>
+              <g id="pack-boxes"></g>
+            </svg>
+          </div>
+        </div>
+
+        <div class="ba__handle" aria-hidden="true"><span></span></div>
+        <span class="ba__tag ba__tag--l">Глазами человека</span>
+        <span class="ba__tag ba__tag--r">Глазами ИИ</span>
+        <input class="ba__range" type="range" min="0" max="100" value="50" aria-label="Сравнение: сдвиньте, чтобы увидеть результат ИИ">
+      </div>
+    </div>
+  </section>
+
+  <!-- Другие направления -->
+  <section class="section" id="directions">
+    <div class="container">
+      <header class="section__head">
+        <p class="kicker">Ещё задачи для машинного зрения</p>
+        <h2>Что ещё Ray делает лучше человека</h2>
+      </header>
+      <div class="dirs">
+        <a class="dir is-current" href="index.html">
+          <span class="dir__n mono">01</span><h3>Детекция брака</h3>
+          <p>Трещины, сколы, царапины и некомплект — на каждой детали.</p><span class="dir__go">Вы здесь</span>
+        </a>
+        <a class="dir" href="tracking.html">
+          <span class="dir__n mono">02</span><h3>Трекинг объектов</h3>
+          <p>ID и маршрут каждой единицы на конвейере — от входа до упаковки.</p><span class="dir__go">Пройти тест →</span>
+        </a>
+        <a class="dir" href="motion.html">
+          <span class="dir__n mono">03</span><h3>Поиск движения</h3>
+          <p>Люди, предметы и животные в кадре — без ложных тревог от дождя и бликов.</p><span class="dir__go">Пройти тест →</span>
+        </a>
+        <a class="dir" href="counting.html">
+          <span class="dir__n mono">04</span><h3>Подсчёт объектов</h3>
+          <p>Точный счёт продукции по типам и цветам в реальном времени.</p><span class="dir__go">Пройти тест →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. ФОРМА -->
+  <section class="section section--cta" id="form">
+    <div class="container form-grid">
+      <div class="form-copy">
+        <p class="kicker">Бесплатно и без обязательств</p>
+        <h2>Протестируйте ИИ на вашем продукте</h2>
+        <p class="lead">Пришлите нам 10 фото ваших деталей, и мы бесплатно покажем, как наш ИИ находит на них брак.</p>
+        <ol class="steps">
+          <li><b>Оставьте заявку</b> — перезвоним в течение рабочего дня.</li>
+          <li><b>Пришлите 10 фото</b> годных и бракованных деталей — можно с телефона.</li>
+          <li><b>Получите отчёт</b> с найденными дефектами и оценкой экономии.</li>
+        </ol>
+      </div>
+      <form class="lead-form" id="lead-form" novalidate>
+        <div class="field">
+          <label for="f-name">Имя</label>
+          <input id="f-name" name="name" type="text" autocomplete="name" required placeholder="Как к вам обращаться">
+        </div>
+        <div class="field">
+          <label for="f-phone">Телефон</label>
+          <input id="f-phone" name="phone" type="tel" autocomplete="tel" required placeholder="+7 (___) ___-__-__" inputmode="tel">
+        </div>
+        <div class="field">
+          <label for="f-link">Ссылка на фото/видео производства <span class="opt">необязательно</span></label>
+          <input id="f-link" name="link" type="url" placeholder="Яндекс Диск, Google Drive, облако…">
+        </div>
+        <input type="hidden" name="direction" value="Детекция брака">
+        <input type="hidden" name="calc" id="f-calc">
+        <p class="calc-attached" id="f-calc-note" hidden></p>
+        <label class="check">
+          <input type="checkbox" name="consent" required>
+          <span>Согласен на <a href="#" target="_blank" rel="noopener">обработку персональных данных</a></span>
+        </label>
+        <button class="btn btn--primary btn--lg btn--block" type="submit">Получить бесплатный тест</button>
+        <p class="form-msg" id="f-msg" role="status"></p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<!-- 8. ФУТЕР -->
+<footer class="footer">
+  <div class="container">
+    <div class="partners" aria-label="Партнёры и клиенты">
+      <p>Нам доверяют</p>
+      <ul>
+        <li><span class="plogo">ЛОГОТИП</span></li>
+        <li><span class="plogo">ЛОГОТИП</span></li>
+        <li><span class="plogo">ЛОГОТИП</span></li>
+        <li><span class="plogo">ЛОГОТИП</span></li>
+        <li><span class="plogo">ЛОГОТИП</span></li>
+      </ul>
+    </div>
+    <div class="footer__grid">
+      <div>
+        <a class="logo logo--footer" href="#top"><img src="assets/ray_logo_rus.svg" alt="Ray" width="118" height="44"></a>
+        <p class="footer__muted">Машинное зрение для контроля качества на производстве.</p>
+      </div>
+      <div>
+        <p class="footer__h">Контакты</p>
+        <p><a href="tel:+70000000000">+7 (000) 000‑00‑00</a></p>
+        <p><a href="mailto:hello@example.com">hello@example.com</a></p>
+        <p class="footer__muted">Москва, ул. Примерная, 1</p>
+      </div>
+      <div>
+        <p class="footer__h">Соцсети</p>
+        <ul class="socials">
+          <li><a href="#" aria-label="Telegram">Telegram</a></li>
+          <li><a href="#" aria-label="ВКонтакте">ВКонтакте</a></li>
+          <li><a href="#" aria-label="YouTube">YouTube</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="footer__copy">© <span id="year">2026</span> Ray. Все расчёты на сайте носят оценочный характер.</p>
+  </div>
+</footer>
+
+<script src="common.js" defer></script>
+<script src="defects.js" defer></script>
+</body>
+</html>

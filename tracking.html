@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ray — трекинг объектов на конвейере</title>
+  <meta name="description" content="Ray присваивает каждой единице на конвейере ID и ведёт её от входа до упаковки. Пройдите тест: уследите за коробкой лучше ИИ.">
+  <meta property="og:title" content="Человек теряет деталь из виду. ИИ — никогда">
+  <meta property="og:description" content="Ray присваивает каждой единице на конвейере ID и ведёт её от входа до упаковки. Пройдите тест: уследите за коробкой лучше ИИ.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#0b0e13">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b0e13'/%3E%3Cpath d='M4 16c3-6 7.5-9 12-9s9 3 12 9c-3 6-7.5 9-12 9s-9-3-12-9z' fill='none' stroke='%232ee6a8' stroke-width='2.4'/%3E%3Ccircle cx='16' cy='16' r='4.5' fill='%232ee6a8'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="header" id="top">
+  <div class="container header__inner">
+    <a class="logo" href="index.html" aria-label="Ray — на главную">
+      <img src="assets/ray_logo_rus.svg" alt="Ray" width="97" height="36">
+    </a>
+    <nav class="dirnav" aria-label="Направления">
+      <a href="index.html">Детекция брака</a>
+      <a href="tracking.html" aria-current="page">Трекинг объектов</a>
+      <a href="motion.html">Поиск движения</a>
+      <a href="counting.html">Подсчёт объектов</a>
+    </nav>
+    <a class="btn btn--sm btn--ghost header__cta" href="#form">Бесплатный тест</a>
+  </div>
+</header>
+
+<main>
+
+  <!-- 1. HERO -->
+  <section class="hero">
+    <div class="container hero__grid">
+      <div class="hero__text">
+        <p class="kicker">Трекинг объектов на конвейере</p>
+        <h1>Человек теряет деталь из виду. <em>ИИ — никогда</em></h1>
+        <p class="lead">Система присваивает каждой единице ID и ведёт её по всей линии: маршрут, время на участке и точка, где что-то пошло не так.</p>
+        <div class="hero__cta">
+          <a class="btn btn--primary btn--lg" href="#test">Пройти тест: уследите за коробкой</a>
+          <a class="btn btn--ghost btn--lg" href="#how">Как это работает</a>
+        </div>
+        <ul class="hero__facts">
+          <li><b>ID</b> у каждой единицы</li>
+          <li><b>100%</b> маршрута сохраняется</li>
+          <li><b>1 видео</b> — и бесплатный тест</li>
+        </ul>
+      </div>
+      <figure class="hero__visual" aria-label="Конвейер с коробками: ИИ присваивает каждой ID и рисует её траекторию">
+        <canvas id="hero-canvas" width="960" height="540" aria-hidden="true"></canvas>
+        <figcaption class="hero__caption hero__caption--single"><span>Так видит ИИ: у каждой коробки — свой номер и маршрут</span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 2. ЧЕЛЛЕНДЖ -->
+  <section class="section" id="test">
+    <div class="container">
+      <header class="section__head">
+        <p class="kicker">Интерактивный тест · 3 раунда</p>
+        <h2>Уследите за коробкой на конвейере</h2>
+        <p class="section__sub">Запомните коробку в <b>жёлтой рамке</b>. Коробки одинаковые и будут меняться рядами. Когда лента остановится — нажмите на свою.</p>
+      </header>
+      <div class="game" id="game">
+        <div class="game__bar">
+          <div class="stat"><span class="stat__label">Раунд</span><span class="stat__value mono" id="g-round">1/3</span></div>
+          <div class="stat"><span class="stat__label">Перестановок</span><span class="stat__value mono" id="g-swaps">0</span></div>
+          <div class="stat"><span class="stat__label">Угадано</span><span class="stat__value mono" id="g-score">0</span></div>
+        </div>
+        <div class="stage" id="stage">
+          <canvas id="g-canvas" width="960" height="540" aria-label="Конвейер с коробками"></canvas>
+          <div class="board__start" id="g-start">
+            <p class="board__start-title">Сможете не упустить коробку?</p>
+            <p class="board__start-sub">3 раунда, с каждым — быстрее и больше перестановок</p>
+            <button class="btn btn--primary btn--lg" id="g-start-btn" type="button">Начать тест</button>
+          </div>
+        </div>
+        <p class="status" id="g-status" aria-live="polite"></p>
+        <div class="game__actions"><button class="btn btn--primary" id="g-next" type="button" hidden>Следующий раунд →</button></div>
+        <div class="result" id="g-result" hidden aria-live="polite">
+          <div class="result__score">
+            <div class="score score--human"><span>Ваш результат</span><b class="mono" id="r-human">2/3</b></div>
+            <div class="score score--ai"><span>Результат ИИ</span><b class="mono">3/3</b></div>
+          </div>
+          <p class="result__copy" id="r-copy"></p>
+          <p class="result__extra" id="r-extra"></p>
+          <div class="result__cta">
+            <a class="btn btn--primary" href="#form">Протестировать на моём видео</a>
+            <button class="btn btn--ghost" id="g-again" type="button">Пройти ещё раз</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. БОЛИ -->
+  <section class="section section--alt" id="why">
+    <div class="container">
+      <header class="section__head">
+        <p class="kicker">Дело не в квалификации</p>
+        <h2>Почему люди проигрывают?</h2>
+        <p class="section__sub">Глаз хорошо замечает отличия, но плохо удерживает одинаковые объекты в движении.</p>
+      </header>
+      <div class="cards3">
+        <article class="pain">
+          <div class="pain__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h7v7H3zM14 7h7v7h-7z"/></svg></div>
+          <h3>Одинаковые объекты</h3>
+          <p>Коробки, бутылки, заготовки неотличимы друг от друга. Стоит отвлечься на секунду — и «своя» потеряна.</p>
+        </article>
+        <article class="pain">
+          <div class="pain__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h11M12 4l3 3-3 3M20 17H9M12 14l-3 3 3 3"/></svg></div>
+          <h3>Перестроения</h3>
+          <p>Объекты меняют ряды, обгоняют друг друга и заходят в тень. Глаз не успевает за всеми сразу.</p>
+        </article>
+        <article class="pain">
+          <div class="pain__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v4h4M12 8v4l3 2"/></svg></div>
+          <h3>Нет истории</h3>
+          <p>Брак нашли на выходе — но на каком участке он появился? Без трека этого уже не узнать.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. КАК РАБОТАЕТ -->
+  <section class="section" id="how">
+    <div class="container">
+      <header class="section__head">
+        <p class="kicker">Технология простыми словами</p>
+        <h2>Цифровой глаз, который помнит каждую единицу</h2>
+        <p class="section__sub">Система не просто видит объект в кадре — она узнаёт его в следующем кадре, и в следующем, и так по всей линии.</p>
+      </header>
+      <ol class="flow">
+        <li class="flow__step">
+          <div class="flow__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h2l2-2h6l2 2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+          <span class="flow__n mono">01</span>
+          <h3>Камера</h3>
+          <p>Снимает конвейер сверху или сбоку — подходят обычные промышленные камеры.</p>
+        </li>
+        <li class="flow__arrow" aria-hidden="true"></li>
+        <li class="flow__step flow__step--ai">
+          <div class="flow__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4a3 3 0 0 0-3 3 3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 6 1V5a2 2 0 0 0-3-1zM15 4a3 3 0 0 1 3 3 3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-6 1"/></svg></div>
+          <span class="flow__n mono">02</span>
+          <h3>Мозг (ИИ)</h3>
+          <p>Присваивает каждому объекту ID и сопоставляет его между кадрами, даже при перестроениях.</p>
+        </li>
+        <li class="flow__arrow" aria-hidden="true"></li>
+        <li class="flow__step">
+          <div class="flow__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19h16M4 15l4-4 4 3 6-7"/></svg></div>
+          <span class="flow__n mono">03</span>
+          <h3>Данные</h3>
+          <p>Маршрут, время на участке, заторы и падения — в отчёте и в вашей учётной системе.</p>
+        </li>
+      </ol>
+      <ul class="benefits">
+        <li>
+          <h3>Прослеживаемость каждой единицы</h3>
+          <p>Где была деталь, сколько стояла и через какие участки прошла.</p>
+        </li>
+        <li>
+          <h3>Поиск узких мест</h3>
+          <p>Видно, где копятся объекты и сколько времени теряется на каждом участке.</p>
+        </li>
+        <li>
+          <h3>Сигнал при сбое</h3>
+          <p>Затор, падение или объект не в своём ряду — оператор узнаёт сразу.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 5. ГДЕ ПРИМЕНЯЕТСЯ -->
+  <section class="section section--alt" id="uses">
+    <div class="container">
+      <header class="section__head">
+        <p class="kicker">Где применяется</p>
+        <h2>Где трекинг окупается быстрее всего</h2>
+      </header>
+      <ul class="uses">
+        <li>
+          <h3>Сортировка и логистика</h3>
+          <p>Каждая посылка уходит в свой рукав — и это можно доказать.</p>
+        </li>
+        <li>
+          <h3>Сборочные линии</h3>
+          <p>Связь брака с конкретным участком, сменой и оборудованием.</p>
+        </li>
+        <li>
+          <h3>Розлив и упаковка</h3>
+          <p>Контроль потока, заторов и упавшей тары на высокой скорости.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Другие направления -->
+  <section class="section" id="directions">
+    <div class="container">
+      <header class="section__head">
+        <p class="kicker">Ещё задачи для машинного зрения</p>
+        <h2>Что ещё Ray делает лучше человека</h2>
+      </header>
+      <div class="dirs">
+        <a class="dir" href="index.html">
+          <span class="dir__n mono">01</span><h3>Детекция брака</h3>
+          <p>Трещины, сколы, царапины и некомплект — на каждой детали.</p><span class="dir__go">Пройти тест →</span>
+        </a>
+        <a class="dir is-current" href="tracking.html">
+          <span class="dir__n mono">02</span><h3>Трекинг объектов</h3>
+          <p>ID и маршрут каждой единицы на конвейере — от входа до упаковки.</p><span class="dir__go">Вы здесь</span>
+        </a>
+        <a class="dir" href="motion.html">
+          <span class="dir__n mono">03</span><h3>Поиск движения</h3>
+          <p>Люди, предметы и животные в кадре — без ложных тревог от дождя и бликов.</p><span class="dir__go">Пройти тест →</span>
+        </a>
+        <a class="dir" href="counting.html">
+          <span class="dir__n mono">04</span><h3>Подсчёт объектов</h3>
+          <p>Точный счёт продукции по типам и цветам в реальном времени.</p><span class="dir__go">Пройти тест →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. ФОРМА -->
+  <section class="section section--cta" id="form">
+    <div class="container form-grid">
+      <div class="form-copy">
+        <p class="kicker">Бесплатно и без обязательств</p>
+        <h2>Протестируйте трекинг на вашей линии</h2>
+        <p class="lead">Пришлите 1–2 минуты видео с вашего конвейера, и мы бесплатно покажем, как ИИ ведёт каждый объект.</p>
+        <ol class="steps">
+          <li><b>Оставьте заявку</b> — перезвоним в течение рабочего дня.</li>
+          <li><b>Пришлите 1–2 минуты видео</b> с вашей камеры — подойдёт запись с телефона.</li>
+          <li><b>Получите отчёт</b> и видео с разметкой ИИ.</li>
+        </ol>
+      </div>
+      <form class="lead-form" id="lead-form" novalidate>
+        <div class="field">
+          <label for="f-name">Имя</label>
+          <input id="f-name" name="name" type="text" autocomplete="name" required placeholder="Как к вам обращаться">
+        </div>
+        <div class="field">
+          <label for="f-phone">Телефон</label>
+          <input id="f-phone" name="phone" type="tel" autocomplete="tel" required placeholder="+7 (___) ___-__-__" inputmode="tel">
+        </div>
+        <div class="field">
+          <label for="f-link">Ссылка на видео с вашей камеры <span class="opt">необязательно</span></label>
+          <input id="f-link" name="link" type="url" placeholder="Яндекс Диск, Google Drive, облако…">
+        </div>
+        <input type="hidden" name="direction" value="Трекинг объектов">
+        <label class="check">
+          <input type="checkbox" name="consent" required>
+          <span>Согласен на <a href="#" target="_blank" rel="noopener">обработку персональных данных</a></span>
+        </label>
+        <button class="btn btn--primary btn--lg btn--block" type="submit">Получить бесплатный тест</button>
+        <p class="form-msg" id="f-msg" role="status"></p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<!-- 8. ФУТЕР -->
+<footer class="footer">
+  <div class="container">
+    <div class="partners" aria-label="Партнёры и клиенты">
+      <p>Нам доверяют</p>
+      <ul>
+        <li><span class="plogo">ЛОГОТИП</span></li>
+        <li><span class="plogo">ЛОГОТИП</span></li>
+        <li><span class="plogo">ЛОГОТИП</span></li>
+        <li><span class="plogo">ЛОГОТИП</span></li>
+        <li><span class="plogo">ЛОГОТИП</span></li>
+      </ul>
+    </div>
+    <div class="footer__grid">
+      <div>
+        <a class="logo logo--footer" href="#top"><img src="assets/ray_logo_rus.svg" alt="Ray" width="118" height="44"></a>
+        <p class="footer__muted">Машинное зрение для контроля качества на производстве.</p>
+      </div>
+      <div>
+        <p class="footer__h">Контакты</p>
+        <p><a href="tel:+70000000000">+7 (000) 000‑00‑00</a></p>
+        <p><a href="mailto:hello@example.com">hello@example.com</a></p>
+        <p class="footer__muted">Москва, ул. Примерная, 1</p>
+      </div>
+      <div>
+        <p class="footer__h">Соцсети</p>
+        <ul class="socials">
+          <li><a href="#" aria-label="Telegram">Telegram</a></li>
+          <li><a href="#" aria-label="ВКонтакте">ВКонтакте</a></li>
+          <li><a href="#" aria-label="YouTube">YouTube</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="footer__copy">© <span id="year">2026</span> Ray. Все расчёты на сайте носят оценочный характер.</p>
+  </div>
+</footer>
+
+<script src="common.js" defer></script>
+<script src="tracking.js" defer></script>
+</body>
+</html>

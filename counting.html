@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ray — подсчёт объектов на видео</title>
+  <meta name="description" content="Ray считает продукцию на видео в реальном времени: по типам, цветам и направлению. Пройдите тест: сосчитаете ли вы точнее ИИ?">
+  <meta property="og:title" content="Сколько прошло по линии? Человек скажет «примерно». ИИ — точно">
+  <meta property="og:description" content="Ray считает продукцию на видео в реальном времени: по типам, цветам и направлению. Пройдите тест: сосчитаете ли вы точнее ИИ?">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#0b0e13">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b0e13'/%3E%3Cpath d='M4 16c3-6 7.5-9 12-9s9 3 12 9c-3 6-7.5 9-12 9s-9-3-12-9z' fill='none' stroke='%232ee6a8' stroke-width='2.4'/%3E%3Ccircle cx='16' cy='16' r='4.5' fill='%232ee6a8'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="header" id="top">
+  <div class="container header__inner">
+    <a class="logo" href="index.html" aria-label="Ray — на главную">
+      <img src="assets/ray_logo_rus.svg" alt="Ray" width="97" height="36">
+    </a>
+    <nav class="dirnav" aria-label="Направления">
+      <a href="index.html">Детекция брака</a>
+      <a href="tracking.html">Трекинг объектов</a>
+      <a href="motion.html">Поиск движения</a>
+      <a href="counting.html" aria-current="page">Подсчёт объектов</a>
+    </nav>
+    <a class="btn btn--sm btn--ghost header__cta" href="#form">Бесплатный тест</a>
+  </div>
+</header>
+
+<main>
+
+  <!-- 1. HERO -->
+  <section class="hero">
+    <div class="container hero__grid">
+      <div class="hero__text">
+        <p class="kicker">Подсчёт объектов на видео</p>
+        <h1>Сколько прошло по линии? Человек скажет <em>«примерно»</em>. ИИ — точно</h1>
+        <p class="lead">Система считает объекты на видео в реальном времени: по типам, цветам и направлению — без ручных отметок и ошибок переноса в журнал.</p>
+        <div class="hero__cta">
+          <a class="btn btn--primary btn--lg" href="#test">Пройти тест: сосчитайте бутылки</a>
+          <a class="btn btn--ghost btn--lg" href="#how">Как это работает</a>
+        </div>
+        <ul class="hero__facts">
+          <li><b>По типам</b> и цветам</li>
+          <li><b>Онлайн</b> данные в отчёт</li>
+          <li><b>1 видео</b> — и бесплатный тест</li>
+        </ul>
+      </div>
+      <figure class="hero__visual" aria-label="Конвейер с бутылками: ИИ считает объекты, пересекающие линию, по цветам">
+        <canvas id="hero-canvas" width="960" height="540" aria-hidden="true"></canvas>
+        <figcaption class="hero__caption hero__caption--single"><span>Так видит ИИ: каждая бутылка распознана и посчитана по цвету</span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 2. ЧЕЛЛЕНДЖ -->
+  <section class="section" id="test">
+    <div class="container">
+      <header class="section__head">
+        <p class="kicker">Интерактивный тест · 14 секунд</p>
+        <h2>Сосчитайте синие бутылки на конвейере</h2>
+        <p class="section__sub">Мимо проедет несколько десятков бутылок разных цветов. Нажимайте <b>«+1»</b> (или пробел) на каждую <b>синюю</b>. Бирюзовые, зелёные и прозрачные — не считаются.</p>
+      </header>
+      <div class="game" id="game">
+        <div class="game__bar">
+          <div class="stat"><span class="stat__label">Осталось</span><span class="stat__value mono" id="g-timer">14,0 с</span></div>
+          <div class="stat"><span class="stat__label">Ваш счёт</span><span class="stat__value mono" id="g-count">0</span></div>
+        </div>
+        <div class="game__progress"><span id="g-progress"></span></div>
+        <div class="stage" id="stage">
+          <canvas id="g-canvas" width="960" height="540" aria-label="Конвейер с бутылками"></canvas>
+          <div class="board__start" id="g-start">
+            <p class="board__start-title">Готовы считать?</p>
+            <p class="board__start-sub">Только синие. Скорость — как на настоящей линии</p>
+            <button class="btn btn--primary btn--lg" id="g-start-btn" type="button">Начать тест</button>
+          </div>
+        </div>
+        <div class="tap">
+          <button class="tap__undo" id="g-undo" type="button" disabled aria-label="Отменить последний счёт">−1</button>
+          <button class="tap__btn" id="g-tap" type="button" disabled>+1 синяя</button>
+        </div>
+        <p class="status" id="g-status" aria-live="polite">Можно нажимать пробел <span class="kbd">Space</span></p>
+        <div class="result" id="g-result" hidden aria-live="polite">
+          <div class="result__score">
+            <div class="score score--human"><span>Вы насчитали</span><b class="mono" id="r-human">12</b></div>
+            <div class="score score--ai"><span>ИИ насчитал</span><b class="mono" id="r-ai">15</b></div>
+          </div>
+          <p class="result__copy" id="r-copy"></p>
+          <p class="result__extra" id="r-extra"></p>
+          <div class="result__cta">
+            <a class="btn btn--primary" href="#form">Протестировать на моём видео</a>
+            <button class="btn btn--ghost" id="g-again" type="button">Пройти ещё раз</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. БОЛИ -->
+  <section class="section section--alt" id="why">
+    <div class="container">
+      <header class="section__head">
+        <p class="kicker">Дело не в квалификации</p>
+        <h2>Почему люди проигрывают?</h2>
+        <p class="section__sub">Считать — простая задача. Пока объектов не становится много и они не начинают двигаться.</p>
+      </header>
+      <div class="cards3">
+        <article class="pain">
+          <div class="pain__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 3L4 14h7l-1 7 9-11h-7z"/></svg></div>
+          <h3>Скорость потока</h3>
+          <p>Когда объекты идут непрерывно, глаз начинает «перескакивать» — одни считаются дважды, другие ни разу.</p>
+        </article>
+        <article class="pain">
+          <div class="pain__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="9" r="4"/><circle cx="16" cy="9" r="4"/><circle cx="12" cy="16" r="4"/></svg></div>
+          <h3>Скопления</h3>
+          <p>Объекты сливаются в кучу, перекрывают друг друга — и «на глаз» становится «примерно».</p>
+        </article>
+        <article class="pain">
+          <div class="pain__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4h6v3H9zM7 5H5v16h14V5h-2M9 12h6M9 16h4"/></svg></div>
+          <h3>Ошибки переноса</h3>
+          <p>Даже верный подсчёт нужно записать в журнал или систему. Ещё одна точка для ошибки.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. КАК РАБОТАЕТ -->
+  <section class="section" id="how">
+    <div class="container">
+      <header class="section__head">
+        <p class="kicker">Технология простыми словами</p>
+        <h2>Цифровой счётчик, который не сбивается</h2>
+        <p class="section__sub">Мы не заменяем учётчиков. Мы снимаем с них монотонный пересчёт — а цифры сразу попадают в систему.</p>
+      </header>
+      <ol class="flow">
+        <li class="flow__step">
+          <div class="flow__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h2l2-2h6l2 2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+          <span class="flow__n mono">01</span>
+          <h3>Камера</h3>
+          <p>Снимает поток продукции, людей или транспорта — подходят существующие камеры.</p>
+        </li>
+        <li class="flow__arrow" aria-hidden="true"></li>
+        <li class="flow__step flow__step--ai">
+          <div class="flow__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4a3 3 0 0 0-3 3 3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 6 1V5a2 2 0 0 0-3-1zM15 4a3 3 0 0 1 3 3 3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-6 1"/></svg></div>
+          <span class="flow__n mono">02</span>
+          <h3>Мозг (ИИ)</h3>
+          <p>Распознаёт каждый объект, определяет тип и цвет и считает его один раз — при пересечении линии.</p>
+        </li>
+        <li class="flow__arrow" aria-hidden="true"></li>
+        <li class="flow__step">
+          <div class="flow__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19h16M7 16V9M12 16V5M17 16v-4"/></svg></div>
+          <span class="flow__n mono">03</span>
+          <h3>Отчёт</h3>
+          <p>Счёт в реальном времени — на экране, в отчёте и в вашей учётной системе.</p>
+        </li>
+      </ol>
+      <ul class="benefits">
+        <li>
+          <h3>Точный счёт по типам</h3>
+          <p>Отдельно по цветам, размерам, артикулам и направлению движения.</p>
+        </li>
+        <li>
+          <h3>Без ручного журнала</h3>
+          <p>Цифры сразу попадают в систему — без ошибок переноса.</p>
+        </li>
+        <li>
+          <h3>Видеодоказательство</h3>
+          <p>Любое расхождение можно проверить по записи с разметкой.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 5. ГДЕ ПРИМЕНЯЕТСЯ -->
+  <section class="section section--alt" id="uses">
+    <div class="container">
+      <header class="section__head">
+        <p class="kicker">Где применяется</p>
+        <h2>Где точный счёт экономит деньги</h2>
+      </header>
+      <ul class="uses">
+        <li>
+          <h3>Выход производственной линии</h3>
+          <p>Сколько единиц выпущено за смену — по каждому артикулу.</p>
+        </li>
+        <li>
+          <h3>Приёмка и отгрузка на складе</h3>
+          <p>Пересчёт коробок и паллет без остановки погрузки.</p>
+        </li>
+        <li>
+          <h3>Потоки людей и транспорта</h3>
+          <p>Посетители, машины на въезде, загрузка зон — в реальном времени.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Другие направления -->
+  <section class="section" id="directions">
+    <div class="container">
+      <header class="section__head">
+        <p class="kicker">Ещё задачи для машинного зрения</p>
+        <h2>Что ещё Ray делает лучше человека</h2>
+      </header>
+      <div class="dirs">
+        <a class="dir" href="index.html">
+          <span class="dir__n mono">01</span><h3>Детекция брака</h3>
+          <p>Трещины, сколы, царапины и некомплект — на каждой детали.</p><span class="dir__go">Пройти тест →</span>
+        </a>
+        <a class="dir" href="tracking.html">
+          <span class="dir__n mono">02</span><h3>Трекинг объектов</h3>
+          <p>ID и маршрут каждой единицы на конвейере — от входа до упаковки.</p><span class="dir__go">Пройти тест →</span>
+        </a>
+        <a class="dir" href="motion.html">
+          <span class="dir__n mono">03</span><h3>Поиск движения</h3>
+          <p>Люди, предметы и животные в кадре — без ложных тревог от дождя и бликов.</p><span class="dir__go">Пройти тест →</span>
+        </a>
+        <a class="dir is-current" href="counting.html">
+          <span class="dir__n mono">04</span><h3>Подсчёт объектов</h3>
+          <p>Точный счёт продукции по типам и цветам в реальном времени.</p><span class="dir__go">Вы здесь</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. ФОРМА -->
+  <section class="section section--cta" id="form">
+    <div class="container form-grid">
+      <div class="form-copy">
+        <p class="kicker">Бесплатно и без обязательств</p>
+        <h2>Протестируйте подсчёт на вашем видео</h2>
+        <p class="lead">Пришлите 1–2 минуты видео с вашей линии или склада, и мы бесплатно покажем, как ИИ считает ваши объекты.</p>
+        <ol class="steps">
+          <li><b>Оставьте заявку</b> — перезвоним в течение рабочего дня.</li>
+          <li><b>Пришлите 1–2 минуты видео</b> с вашей камеры — подойдёт запись с телефона.</li>
+          <li><b>Получите отчёт</b> и видео с разметкой ИИ.</li>
+        </ol>
+      </div>
+      <form class="lead-form" id="lead-form" novalidate>
+        <div class="field">
+          <label for="f-name">Имя</label>
+          <input id="f-name" name="name" type="text" autocomplete="name" required placeholder="Как к вам обращаться">
+        </div>
+        <div class="field">
+          <label for="f-phone">Телефон</label>
+          <input id="f-phone" name="phone" type="tel" autocomplete="tel" required placeholder="+7 (___) ___-__-__" inputmode="tel">
+        </div>
+        <div class="field">
+          <label for="f-link">Ссылка на видео с вашей камеры <span class="opt">необязательно</span></label>
+          <input id="f-link" name="link" type="url" placeholder="Яндекс Диск, Google Drive, облако…">
+        </div>
+        <input type="hidden" name="direction" value="Подсчёт объектов">
+        <label class="check">
+          <input type="checkbox" name="consent" required>
+          <span>Согласен на <a href="#" target="_blank" rel="noopener">обработку персональных данных</a></span>
+        </label>
+        <button class="btn btn--primary btn--lg btn--block" type="submit">Получить бесплатный тест</button>
+        <p class="form-msg" id="f-msg" role="status"></p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<!-- 8. ФУТЕР -->
+<footer class="footer">
+  <div class="container">
+    <div class="partners" aria-label="Партнёры и клиенты">
+      <p>Нам доверяют</p>
+      <ul>
+        <li><span class="plogo">ЛОГОТИП</span></li>
+        <li><span class="plogo">ЛОГОТИП</span></li>
+        <li><span class="plogo">ЛОГОТИП</span></li>
+        <li><span class="plogo">ЛОГОТИП</span></li>
+        <li><span class="plogo">ЛОГОТИП</span></li>
+      </ul>
+    </div>
+    <div class="footer__grid">
+      <div>
+        <a class="logo logo--footer" href="#top"><img src="assets/ray_logo_rus.svg" alt="Ray" width="118" height="44"></a>
+        <p class="footer__muted">Машинное зрение для контроля качества на производстве.</p>
+      </div>
+      <div>
+        <p class="footer__h">Контакты</p>
+        <p><a href="tel:+70000000000">+7 (000) 000‑00‑00</a></p>
+        <p><a href="mailto:hello@example.com">hello@example.com</a></p>
+        <p class="footer__muted">Москва, ул. Примерная, 1</p>
+      </div>
+      <div>
+        <p class="footer__h">Соцсети</p>
+        <ul class="socials">
+          <li><a href="#" aria-label="Telegram">Telegram</a></li>
+          <li><a href="#" aria-label="ВКонтакте">ВКонтакте</a></li>
+          <li><a href="#" aria-label="YouTube">YouTube</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="footer__copy">© <span id="year">2026</span> Ray. Все расчёты на сайте носят оценочный характер.</p>
+  </div>
+</footer>
+
+<script src="common.js" defer></script>
+<script src="counting.js" defer></script>
+</body>
+</html>
