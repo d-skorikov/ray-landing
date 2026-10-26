@@ -318,6 +318,25 @@ function initBeforeAfter() {
   range.addEventListener('input', update);
   update();
 
+  // Перетаскивание мышью и пальцем по всей площади кадра; ползунок-input остаётся для клавиатуры
+  const setFromPointer = (e) => {
+    const r = ba.getBoundingClientRect();
+    range.value = Math.round(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * 100);
+    update();
+  };
+  let dragging = false;
+  ba.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return;
+    dragging = true;
+    ba.setPointerCapture(e.pointerId);
+    ba.classList.add('is-dragging');
+    setFromPointer(e);
+  });
+  ba.addEventListener('pointermove', (e) => { if (dragging) setFromPointer(e); });
+  const stop = () => { dragging = false; ba.classList.remove('is-dragging'); };
+  ba.addEventListener('pointerup', stop);
+  ba.addEventListener('pointercancel', stop);
+
   $$('.tabs [role=tab]').forEach((tab) => {
     tab.addEventListener('click', () => {
       $$('.tabs [role=tab]').forEach((t) => t.setAttribute('aria-selected', t === tab));
