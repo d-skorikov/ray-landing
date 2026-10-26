@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ray — вычислители для машинного зрения</title>
+  <meta name="description" content="Четыре мини-компьютера с нейроускорителями для машинного зрения: от 3 до 117 TOPS, от 4 479 до 82 595 ₽. Каждый — под свою задачу: от одной камеры до видеоаналитики участка.">
+  <meta property="og:title" content="Свой вычислитель под каждую задачу машинного зрения">
+  <meta property="og:description" content="От точечного контроля на одной камере до видеоаналитики целого участка: 3–117 TOPS, нейросеть работает прямо у линии.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#0b0e13">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b0e13'/%3E%3Cpath d='M4 16c3-6 7.5-9 12-9s9 3 12 9c-3 6-7.5 9-12 9s-9-3-12-9z' fill='none' stroke='%232ee6a8' stroke-width='2.4'/%3E%3Ccircle cx='16' cy='16' r='4.5' fill='%232ee6a8'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Общие SVG-определения: сетка-чертёж и разъёмы плат -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <pattern id="bp" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="rgba(46,230,168,.07)"/></pattern>
+    <radialGradient id="glow"><stop offset="0" stop-color="#2ee6a8" stop-opacity=".35"/><stop offset="1" stop-color="#2ee6a8" stop-opacity="0"/></radialGradient>
+    <linearGradient id="alu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a4452"/><stop offset="1" stop-color="#232a34"/></linearGradient>
+    <symbol id="p-usb" viewBox="0 0 40 30"><rect x="1" y="1" width="38" height="28" rx="2" fill="#9aa6b5"/><rect x="5" y="6" width="30" height="7" fill="#0b0e13"/><rect x="5" y="17" width="30" height="7" fill="#0b0e13"/><rect x="5" y="9" width="30" height="2" fill="#2f6fd8"/><rect x="5" y="20" width="30" height="2" fill="#2f6fd8"/></symbol>
+    <symbol id="p-rj" viewBox="0 0 40 34"><rect x="1" y="1" width="38" height="32" rx="2" fill="#a7b1be"/><path d="M8 8h24v14h-6v5H14v-5H8z" fill="#0b0e13"/><rect x="4" y="27" width="5" height="3" fill="#2ee6a8"/><rect x="31" y="27" width="5" height="3" fill="#ffb020"/></symbol>
+    <symbol id="p-hdmi" viewBox="0 0 34 14"><path d="M1 1h32v8l-4 4H5L1 9z" fill="#a7b1be"/><path d="M5 4h24v4l-2 2H7L5 8z" fill="#0b0e13"/></symbol>
+    <symbol id="p-pin" viewBox="0 0 10 10"><rect width="10" height="10" fill="#0d1117"/><rect x="3" y="3" width="4" height="4" fill="#d6b65a"/></symbol>
+  </defs>
+</svg>
+
+<header class="header" id="top">
+  <div class="container header__inner">
+    <a class="logo" href="index.html" aria-label="Ray — на главную">
+      <img src="assets/ray_logo_rus.svg" alt="Ray" width="97" height="36">
+    </a>
+    <nav class="dirnav" aria-label="Направления">
+      <a href="index.html">Детекция брака</a>
+      <a href="tracking.html">Трекинг объектов</a>
+      <a href="motion.html">Поиск движения</a>
+      <a href="counting.html">Подсчёт объектов</a>
+      <a href="hardware.html" aria-current="page">Вычислители</a>
+    </nav>
+    <a class="btn btn--sm btn--ghost header__cta" href="#form">Подобрать вычислитель</a>
+  </div>
+</header>
+
+<main>
+
+  <!-- 1. HERO + подбор по задаче -->
+  <section class="hero" id="pick">
+    <div class="container hero__grid">
+      <div class="hero__text">
+        <p class="kicker">Вычислители для машинного зрения</p>
+        <h1>Своё железо под <em class="em-ai">каждую задачу</em> машинного зрения</h1>
+        <p class="lead">Четыре мини‑компьютера с нейроускорителями. Нейросеть работает прямо у линии: без облака, без отправки видео наружу и без абонентской платы.</p>
+        <div class="hero__cta">
+          <a class="btn btn--primary btn--lg" href="#devices">Смотреть решения</a>
+          <a class="btn btn--ghost btn--lg" href="#form">Подобрать под задачу</a>
+        </div>
+        <ul class="hero__facts">
+          <li><b>3–117</b> TOPS</li>
+          <li><b>от 4 479 ₽</b> за вычислитель</li>
+          <li><b>0 ₽</b> за облако</li>
+        </ul>
+      </div>
+
+      <div class="picker" aria-label="Подбор вычислителя по задаче">
+        <p class="picker__q">Какая у вас задача?</p>
+        <div class="picker__opts" role="radiogroup" aria-label="Задача">
+          <button class="picker__opt" type="button" role="radio" aria-checked="true" data-target="hw-opi">
+            <span class="picker__n mono">01</span>
+            <span><b>Один вопрос на одной камере</b><small>Есть ли деталь, наклеена ли этикетка, сколько прошло</small></span>
+          </button>
+          <button class="picker__opt" type="button" role="radio" aria-checked="false" data-target="hw-rk">
+            <span class="picker__n mono">02</span>
+            <span><b>Пост на линии: 2–4 камеры</b><small>Подсчёт по типам, СИЗ, комплектность упаковки</small></span>
+          </button>
+          <button class="picker__opt" type="button" role="radio" aria-checked="false" data-target="hw-nano">
+            <span class="picker__n mono">03</span>
+            <span><b>Брак в реальном времени</b><small>Трещины, сколы и царапины на каждой детали в потоке</small></span>
+          </button>
+          <button class="picker__opt" type="button" role="radio" aria-checked="false" data-target="hw-nx">
+            <span class="picker__n mono">04</span>
+            <span><b>Участок целиком: 6–8 камер</b><small>Сквозной трекинг, каскад моделей, локальная VLM</small></span>
+          </button>
+        </div>
+        <a class="picker__res" id="picker-res" href="#hw-opi" aria-live="polite">
+          <span class="picker__label">Решение</span>
+          <b class="picker__name" id="picker-name">Orange Pi 4 Pro</b>
+          <span class="picker__nums mono"><span id="picker-tops">3 TOPS</span><span id="picker-price">4 479 ₽</span></span>
+          <span class="picker__go">Подробнее ↓</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. ЧЕТЫРЕ РЕШЕНИЯ -->
+  <section class="section section--alt" id="devices">
+    <div class="container">
+      <header class="section__head">
+        <p class="kicker">Четыре задачи — четыре решения</p>
+        <h2>Под каждый масштаб задачи — свой вычислитель</h2>
+        <p class="section__sub">Здесь нет «лучше» и «хуже». Датчику на одной камере не нужен GPU за 80 тысяч, а видеоаналитику цеха не потянет плата за 4 тысячи. Выбираем то, что закрывает вашу задачу без переплаты.</p>
+      </header>
+
+      <!-- 01. Orange Pi 4 Pro -->
+      <article class="hw" id="hw-opi" data-name="Orange Pi 4 Pro" data-tops="3 TOPS" data-price="4 479 ₽">
+        <figure class="hw__visual">
+          <svg viewBox="0 0 400 300" role="img" aria-label="Схема платы Orange Pi 4 Pro">
+            <rect width="400" height="300" fill="url(#bp)"/>
+            <rect x="60" y="56" width="280" height="188" rx="12" fill="#123257" stroke="#2d5f99" stroke-width="2"/>
+            <g fill="#0b0e13" stroke="#2d5f99"><circle cx="76" cy="72" r="6"/><circle cx="324" cy="72" r="6"/><circle cx="76" cy="228" r="6"/><circle cx="324" cy="228" r="6"/></g>
+            <g>
+              <use href="#p-pin" x="100" y="62" width="9" height="9"/><use href="#p-pin" x="110" y="62" width="9" height="9"/><use href="#p-pin" x="120" y="62" width="9" height="9"/><use href="#p-pin" x="130" y="62" width="9" height="9"/><use href="#p-pin" x="140" y="62" width="9" height="9"/><use href="#p-pin" x="150" y="62" width="9" height="9"/><use href="#p-pin" x="160" y="62" width="9" height="9"/><use href="#p-pin" x="170" y="62" width="9" height="9"/><use href="#p-pin" x="180" y="62" width="9" height="9"/><use href="#p-pin" x="190" y="62" width="9" height="9"/><use href="#p-pin" x="200" y="62" width="9" height="9"/><use href="#p-pin" x="210" y="62" width="9" height="9"/><use href="#p-pin" x="220" y="62" width="9" height="9"/><use href="#p-pin" x="230" y="62" width="9" height="9"/><use href="#p-pin" x="240" y="62" width="9" height="9"/><use href="#p-pin" x="250" y="62" width="9" height="9"/><use href="#p-pin" x="260" y="62" width="9" height="9"/><use href="#p-pin" x="270" y="62" width="9" height="9"/><use href="#p-pin" x="280" y="62" width="9" height="9"/><use href="#p-pin" x="290" y="62" width="9" height="9"/>
+            </g>
+            <use href="#p-usb" x="24" y="96" width="50" height="38"/>
+            <use href="#p-usb" x="24" y="140" width="50" height="38"/>
+            <use href="#p-rj" x="20" y="184" width="54" height="46"/>
+            <use href="#p-hdmi" x="232" y="226" width="44" height="18"/>
+            <rect x="286" y="226" width="24" height="12" rx="4" fill="#a7b1be"/>
+            <rect x="300" y="110" width="30" height="64" rx="3" fill="#0d1a2c" stroke="#2d5f99"/>
+            <text x="315" y="146" class="svg-mono" font-size="9" fill="#6f8fb8" text-anchor="middle" transform="rotate(-90 315 142)">CSI</text>
+            <rect x="220" y="104" width="54" height="34" rx="3" fill="#1b1f27" stroke="#3a4759"/>
+            <text x="247" y="125" class="svg-mono" font-size="9" fill="#93a1b3" text-anchor="middle">LPDDR5</text>
+            <circle cx="170" cy="150" r="70" fill="url(#glow)" class="hw__pulse"/>
+            <rect x="130" y="110" width="80" height="80" rx="6" fill="#0d1117" stroke="#2ee6a8" stroke-width="2"/>
+            <text x="170" y="146" class="svg-mono" font-size="14" font-weight="700" fill="#e8edf3" text-anchor="middle">A733</text>
+            <text x="170" y="166" class="svg-mono" font-size="10" fill="#2ee6a8" text-anchor="middle">NPU</text>
+          </svg>
+          <figcaption class="hw__badge mono"><b>3</b> TOPS</figcaption>
+        </figure>
+        <div class="hw__body">
+          <p class="hw__task"><span class="mono">01</span> Точечный контроль на одной камере</p>
+          <h3>Orange Pi 4 Pro <span class="hw__cfg">4 ГБ</span></h3>
+          <div class="hw__nums">
+            <div><span>Производительность NPU</span><b class="mono">3 TOPS</b></div>
+            <div><span>Цена на AliExpress</span><b class="mono">4 479 ₽</b></div>
+          </div>
+          <p class="hw__lead">Одна точка контроля — один вопрос: есть деталь или нет, наклеена ли этикетка, закрыта ли крышка, сколько единиц прошло. Плата размером 89×56 мм ставится прямо у камеры, а с модулем PoE к ней тянется один сетевой кабель.</p>
+          <ul class="hw__uses">
+            <li>Наличие крышки, этикетки или вкладыша в коробке</li>
+            <li>Подсчёт штук на одном конвейере</li>
+            <li>Человек в опасной зоне станка — сигнал на остановку</li>
+          </ul>
+          <dl class="hw__specs">
+            <div><dt>Процессор</dt><dd>Allwinner A733: 2× Cortex‑A76 + 6× Cortex‑A55</dd></div>
+            <div><dt>Нейроускоритель</dt><dd>NPU до 3 TOPS (INT8)</dd></div>
+            <div><dt>Память</dt><dd>4 ГБ LPDDR5, слот M.2 NVMe, microSD</dd></div>
+            <div><dt>Камеры</dt><dd>2× MIPI CSI или USB‑камера</dd></div>
+            <div><dt>Связь</dt><dd>Gigabit Ethernet (PoE — доп. модуль), Wi‑Fi 6, Bluetooth 5.4</dd></div>
+            <div><dt>Ориентир</dt><dd>1 камера, лёгкие модели детекции и классификации</dd></div>
+          </dl>
+          <div class="hw__dirs">
+            <span>Направления Ray:</span>
+            <a href="counting.html">Подсчёт объектов</a>
+            <a href="motion.html">Поиск движения</a>
+          </div>
+          <div class="hw__cta">
+            <a class="btn btn--primary" href="#form" data-device="Orange Pi 4 Pro">Обсудить задачу</a>
+            <a class="btn btn--ghost" href="https://aliexpress.ru/item/1005012979856352.html?sku_id=12000059935338441" target="_blank" rel="noopener sponsored">Открыть на AliExpress ↗</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- 02. RK3576 -->
+      <article class="hw hw--flip" id="hw-rk" data-name="Плата RK3576" data-tops="6 TOPS" data-price="12 242 ₽">
+        <figure class="hw__visual">
+          <svg viewBox="0 0 400 300" role="img" aria-label="Схема платы на Rockchip RK3576 в корпусе">
+            <rect width="400" height="300" fill="url(#bp)"/>
+            <rect x="48" y="50" width="304" height="200" rx="14" fill="#161b22" stroke="#3a4759" stroke-width="2"/>
+            <rect x="62" y="64" width="276" height="172" rx="8" fill="#0f2238" stroke="#24456b"/>
+            <circle cx="178" cy="148" r="84" fill="url(#glow)" class="hw__pulse"/>
+            <rect x="110" y="84" width="136" height="128" rx="6" fill="#20252e" stroke="#2ee6a8" stroke-width="2"/>
+            <g stroke="#3d4655" stroke-width="5" stroke-linecap="round">
+              <path d="M126 96v104M140 96v104M154 96v104M168 96v104M182 96v104M196 96v104M210 96v104M224 96v104M238 96v104"/>
+            </g>
+            <rect x="140" y="130" width="76" height="36" rx="4" fill="#0d1117" stroke="#2ee6a8"/>
+            <text x="178" y="146" class="svg-mono" font-size="12" font-weight="700" fill="#e8edf3" text-anchor="middle">RK3576</text>
+            <text x="178" y="160" class="svg-mono" font-size="9" fill="#2ee6a8" text-anchor="middle">NPU · VPU</text>
+            <use href="#p-rj" x="290" y="76" width="50" height="42"/>
+            <use href="#p-usb" x="294" y="126" width="46" height="34"/>
+            <use href="#p-usb" x="294" y="166" width="46" height="34"/>
+            <use href="#p-hdmi" x="290" y="210" width="40" height="16"/>
+            <g stroke="#93a1b3" stroke-width="3" stroke-linecap="round"><path d="M80 50V18"/><path d="M110 50V24"/></g>
+            <circle cx="80" cy="16" r="4" fill="#93a1b3"/><circle cx="110" cy="22" r="4" fill="#93a1b3"/>
+            <g fill="none" stroke="rgba(46,230,168,.5)" stroke-width="1.5" stroke-dasharray="3 4">
+              <path d="M8 120h40"/><path d="M8 150h40"/><path d="M8 180h40"/><path d="M8 210h40"/>
+            </g>
+            <g class="svg-mono" font-size="9" fill="#2ee6a8"><text x="8" y="115">CAM 1</text><text x="8" y="145">CAM 2</text><text x="8" y="175">CAM 3</text><text x="8" y="205">CAM 4</text></g>
+          </svg>
+          <figcaption class="hw__badge mono"><b>6</b> TOPS</figcaption>
+        </figure>
+        <div class="hw__body">
+          <p class="hw__task"><span class="mono">02</span> Видеоаналитика поста: несколько камер</p>
+          <h3>Плата RK3576 <span class="hw__cfg">4 ГБ / 32 ГБ eMMC, в корпусе</span></h3>
+          <div class="hw__nums">
+            <div><span>Производительность NPU</span><b class="mono">6 TOPS</b></div>
+            <div><span>Цена на AliExpress</span><b class="mono">12 242 ₽</b></div>
+          </div>
+          <p class="hw__lead">Аппаратный видеодекодер принимает потоки с нескольких IP‑камер, а NPU прогоняет по ним детекцию. Решение для поста, где 2–4 камеры смотрят с разных ракурсов, а задача — найти, посчитать, проследить. Плата приходит в корпусе и со встроенной памятью: распаковали, прошили, поставили в шкаф.</p>
+          <ul class="hw__uses">
+            <li>Подсчёт продукции по типам на конвейере с 2–4 ракурсов</li>
+            <li>Контроль СИЗ на входе в цех: каска, жилет, очки</li>
+            <li>Проверка комплектности упаковки перед паллетированием</li>
+          </ul>
+          <dl class="hw__specs">
+            <div><dt>Процессор</dt><dd>Rockchip RK3576: 4× Cortex‑A72 + 4× Cortex‑A53</dd></div>
+            <div><dt>Нейроускоритель</dt><dd>NPU 6 TOPS (INT8), инструменты RKNN</dd></div>
+            <div><dt>Видео</dt><dd>Аппаратный декод до 8K, кодирование до 4K, GPU Mali‑G52</dd></div>
+            <div><dt>Память</dt><dd>4 ГБ ОЗУ, 32 ГБ eMMC</dd></div>
+            <div><dt>Связь</dt><dd>Ethernet, Wi‑Fi 6 (2,4/5 ГГц), Bluetooth 5.2</dd></div>
+            <div><dt>Ориентир</dt><dd>2–4 потока 1080p с лёгкими моделями детекции</dd></div>
+          </dl>
+          <div class="hw__dirs">
+            <span>Направления Ray:</span>
+            <a href="counting.html">Подсчёт объектов</a>
+            <a href="tracking.html">Трекинг объектов</a>
+            <a href="motion.html">Поиск движения</a>
+          </div>
+          <div class="hw__cta">
+            <a class="btn btn--primary" href="#form" data-device="Плата RK3576">Обсудить задачу</a>
+            <a class="btn btn--ghost" href="https://aliexpress.ru/item/1005010537044591.html?sku_id=12000052741966265" target="_blank" rel="noopener sponsored">Открыть на AliExpress ↗</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- 03. Jetson Orin Nano Super -->
+      <article class="hw" id="hw-nano" data-name="Jetson Orin Nano Super" data-tops="67 TOPS" data-price="65 622 ₽">
+        <figure class="hw__visual">
+          <svg viewBox="0 0 400 300" role="img" aria-label="Схема комплекта Jetson Orin Nano Super с камерой">
+            <rect width="400" height="300" fill="url(#bp)"/>
+            <rect x="70" y="70" width="270" height="180" rx="10" fill="#14171d" stroke="#3a4759" stroke-width="2"/>
+            <use href="#p-rj" x="80" y="214" width="40" height="34"/>
+            <use href="#p-usb" x="126" y="216" width="36" height="28"/>
+            <use href="#p-usb" x="166" y="216" width="36" height="28"/>
+            <rect x="210" y="226" width="30" height="14" rx="2" fill="#a7b1be"/>
+            <circle cx="205" cy="140" r="98" fill="url(#glow)" class="hw__pulse"/>
+            <rect x="120" y="66" width="170" height="140" rx="8" fill="url(#alu)" stroke="#2ee6a8" stroke-width="2"/>
+            <circle cx="205" cy="136" r="50" fill="#0d1117" stroke="#4a5566" stroke-width="2"/>
+            <g class="hw__fan" style="transform-origin:205px 136px">
+              <path d="M205 136l0-44a14 14 0 0 1 16 14zM205 136l38 22a14 14 0 0 1-21 7zM205 136l-38 22a14 14 0 0 1 5-21zM205 136l-38-22a14 14 0 0 1 21-7zM205 136l38-22a14 14 0 0 1-5 21zM205 136l0 44a14 14 0 0 1-16-14z" fill="#2a313c"/>
+            </g>
+            <circle cx="205" cy="136" r="13" fill="#0d1117" stroke="#2ee6a8"/>
+            <text x="205" y="196" class="svg-mono" font-size="11" font-weight="700" fill="#e8edf3" text-anchor="middle">ORIN NANO</text>
+            <path d="M340 150h20v-60" fill="none" stroke="#d6a53a" stroke-width="6"/>
+            <rect x="344" y="46" width="34" height="44" rx="4" fill="#1b2a1e" stroke="#4a5566"/>
+            <circle cx="361" cy="64" r="11" fill="#0d1117" stroke="#2ee6a8" stroke-width="2"/>
+            <circle cx="361" cy="64" r="4" fill="#2ee6a8"/>
+            <text x="361" y="40" class="svg-mono" font-size="9" fill="#93a1b3" text-anchor="middle">IMX219</text>
+            <rect x="20" y="110" width="40" height="70" rx="4" fill="#0f2238" stroke="#24456b"/>
+            <text x="40" y="150" class="svg-mono" font-size="9" fill="#6f8fb8" text-anchor="middle" transform="rotate(-90 40 146)">SSD 256</text>
+            <path d="M60 145h10" stroke="#24456b" stroke-width="3"/>
+          </svg>
+          <figcaption class="hw__badge mono"><b>67</b> TOPS</figcaption>
+        </figure>
+        <div class="hw__body">
+          <p class="hw__task"><span class="mono">03</span> Детекция брака в реальном времени</p>
+          <h3>NVIDIA Jetson Orin Nano Super <span class="hw__cfg">8 ГБ, комплект AI Large Model Kit</span></h3>
+          <div class="hw__nums">
+            <div><span>Производительность ИИ</span><b class="mono">67 TOPS</b></div>
+            <div><span>Цена на AliExpress</span><b class="mono">65 622 ₽</b></div>
+          </div>
+          <p class="hw__lead">Для задач, где нужна тяжёлая модель и точность до пикселя: сегментация трещин, сколов и царапин на каждой детали в потоке. Внутри полноценный GPU NVIDIA с CUDA и TensorRT — те же инструменты, что на серверах, поэтому обученная модель переносится без переделки. Комплект готов к пилоту из коробки: камера, SSD с системой, корпус.</p>
+          <ul class="hw__uses">
+            <li>Сегментация микротрещин и сколов на металле, стекле, пластике</li>
+            <li>Детекция + трекинг: бракованная деталь получает ID и снимается с линии отбраковщиком</li>
+            <li>Голосовой помощник оператора на локальной языковой модели — модуль в комплекте</li>
+          </ul>
+          <dl class="hw__specs">
+            <div><dt>GPU</dt><dd>NVIDIA Ampere: 1024 ядра CUDA, 32 тензорных ядра</dd></div>
+            <div><dt>Процессор</dt><dd>6× Arm Cortex‑A78AE</dd></div>
+            <div><dt>ИИ</dt><dd>67 TOPS (INT8, режим Super)</dd></div>
+            <div><dt>Память</dt><dd>8 ГБ LPDDR5, 102 ГБ/с; SSD 256 ГБ</dd></div>
+            <div><dt>Камеры</dt><dd>2× MIPI CSI‑2, USB, IP‑камеры по сети</dd></div>
+            <div><dt>Ориентир</dt><dd>2–4 камеры с детекцией, сегментацией и трекингом</dd></div>
+          </dl>
+          <details class="hw__kit">
+            <summary>Что в комплекте</summary>
+            <ul>
+              <li>Плата Jetson Orin Nano Super Developer Kit, 8 ГБ</li>
+              <li>SSD 256 ГБ с установленной системой</li>
+              <li>Камера IMX219, угол обзора 77°</li>
+              <li>Алюминиевый корпус с регулируемым кронштейном для камеры</li>
+              <li>Wi‑Fi‑карта (установлена) и антенны</li>
+              <li>Голосовой модуль для языковых моделей и динамик</li>
+              <li>Блок питания, кабели DP→HDMI и Type‑C</li>
+            </ul>
+          </details>
+          <div class="hw__dirs">
+            <span>Направления Ray:</span>
+            <a href="index.html">Детекция брака</a>
+            <a href="tracking.html">Трекинг объектов</a>
+          </div>
+          <div class="hw__cta">
+            <a class="btn btn--primary" href="#form" data-device="Jetson Orin Nano Super">Обсудить задачу</a>
+            <a class="btn btn--ghost" href="https://aliexpress.ru/item/1005008364124351.html?sku_id=12000050857082051" target="_blank" rel="noopener sponsored">Открыть на AliExpress ↗</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- 04. Jetson Orin NX Super -->
+      <article class="hw hw--flip" id="hw-nx" data-name="Jetson Orin NX Super" data-tops="117 TOPS" data-price="82 595 ₽">
+        <figure class="hw__visual">
+          <svg viewBox="0 0 400 300" role="img" aria-label="Схема вычислителя Jetson Orin NX Super, к которому подключены восемь камер">
+            <rect width="400" height="300" fill="url(#bp)"/>
+            <g fill="none" stroke="rgba(46,230,168,.45)" stroke-width="1.5" stroke-dasharray="3 4">
+              <path d="M83 53L130 110"/><path d="M200 22V80"/><path d="M317 53L270 110"/><path d="M24 150H110"/>
+              <path d="M376 150H290"/><path d="M83 247L130 200"/><path d="M200 278V226"/><path d="M317 247L270 200"/>
+            </g>
+            <g fill="#141a22" stroke="#2ee6a8" stroke-width="1.5">
+              <rect x="70" y="44" width="26" height="18" rx="4"/><rect x="187" y="8" width="26" height="18" rx="4"/><rect x="304" y="44" width="26" height="18" rx="4"/>
+              <rect x="6" y="141" width="26" height="18" rx="4"/><rect x="368" y="141" width="26" height="18" rx="4"/>
+              <rect x="70" y="238" width="26" height="18" rx="4"/><rect x="187" y="272" width="26" height="18" rx="4"/><rect x="304" y="238" width="26" height="18" rx="4"/>
+            </g>
+            <circle cx="200" cy="152" r="110" fill="url(#glow)" class="hw__pulse"/>
+            <rect x="110" y="80" width="180" height="146" rx="14" fill="url(#alu)" stroke="#2ee6a8" stroke-width="2"/>
+            <g stroke="#1a2029" stroke-width="3"><path d="M124 96h152M124 106h152M124 116h152"/></g>
+            <circle cx="200" cy="164" r="40" fill="#0d1117" stroke="#4a5566" stroke-width="2"/>
+            <g class="hw__fan" style="transform-origin:200px 164px">
+              <path d="M200 164l0-34a11 11 0 0 1 13 11zM200 164l30 17a11 11 0 0 1-17 5zM200 164l-30 17a11 11 0 0 1 4-16zM200 164l-30-17a11 11 0 0 1 17-5zM200 164l30-17a11 11 0 0 1-4 16zM200 164l0 34a11 11 0 0 1-13-11z" fill="#2a313c"/>
+            </g>
+            <circle cx="200" cy="164" r="10" fill="#0d1117" stroke="#2ee6a8"/>
+            <text x="200" y="220" class="svg-mono" font-size="11" font-weight="700" fill="#e8edf3" text-anchor="middle">ORIN NX</text>
+          </svg>
+          <figcaption class="hw__badge mono"><b>117</b> TOPS</figcaption>
+        </figure>
+        <div class="hw__body">
+          <p class="hw__task"><span class="mono">04</span> Центр видеоаналитики участка</p>
+          <h3>NVIDIA Jetson Orin NX Super <span class="hw__cfg">8 ГБ, комплект AI Large Model Kit</span></h3>
+          <div class="hw__nums">
+            <div><span>Производительность ИИ</span><b class="mono">117 TOPS</b></div>
+            <div><span>Цена на AliExpress</span><b class="mono">82 595 ₽</b></div>
+          </div>
+          <p class="hw__lead">Один вычислитель на участок или цех: 6–8 камер и каскад моделей, которые работают одновременно — найти объект, классифицировать дефект, прочитать маркировку. Остаётся запас, чтобы рядом с видеоаналитикой работала локальная визуально‑языковая модель: оператор спрашивает текстом или голосом, что произошло на линии.</p>
+          <ul class="hw__uses">
+            <li>Сквозной трекинг продукции через несколько камер и участков</li>
+            <li>Каскад: детекция → классификация дефекта → распознавание маркировки</li>
+            <li>Склад и периметр: люди, техника и движение на 6–8 камерах</li>
+          </ul>
+          <dl class="hw__specs">
+            <div><dt>GPU</dt><dd>NVIDIA Ampere: 1024 ядра CUDA, 32 тензорных ядра</dd></div>
+            <div><dt>Процессор</dt><dd>6× Arm Cortex‑A78AE, до 2 ГГц</dd></div>
+            <div><dt>ИИ</dt><dd>117 TOPS (INT8, режим Super), ускоритель NVDLA</dd></div>
+            <div><dt>Память</dt><dd>8 ГБ LPDDR5, 102 ГБ/с; SSD 256 ГБ</dd></div>
+            <div><dt>Камеры</dt><dd>2× MIPI CSI‑2, USB, IP‑камеры по сети</dd></div>
+            <div><dt>Ориентир</dt><dd>6–8 потоков 1080p, несколько моделей одновременно</dd></div>
+          </dl>
+          <details class="hw__kit">
+            <summary>Что в комплекте</summary>
+            <ul>
+              <li>Jetson Orin NX Super Developer Kit, 8 ГБ</li>
+              <li>SSD 256 ГБ с установленной системой</li>
+              <li>Камера IMX219, угол обзора 77°</li>
+              <li>Алюминиевый корпус с регулируемым кронштейном для камеры</li>
+              <li>Wi‑Fi‑карта (установлена) и антенны</li>
+              <li>Голосовой модуль для языковых моделей и динамик</li>
+              <li>Блок питания, кабели DP→HDMI и Type‑C</li>
+            </ul>
+          </details>
+          <div class="hw__dirs">
+            <span>Направления Ray:</span>
+            <a href="tracking.html">Трекинг объектов</a>
+            <a href="motion.html">Поиск движения</a>
+            <a href="index.html">Детекция брака</a>
+          </div>
+          <div class="hw__cta">
+            <a class="btn btn--primary" href="#form" data-device="Jetson Orin NX Super">Обсудить задачу</a>
+            <a class="btn btn--ghost" href="https://aliexpress.ru/item/1005005589813181.html?sku_id=12000053267824543" target="_blank" rel="noopener sponsored">Открыть на AliExpress ↗</a>
+          </div>
+        </div>
+      </article>
+
+      <p class="hw__note">Цены — с AliExpress на 26 октября 2026 года, без доставки, для указанной комплектации. Продавец может их изменить. TOPS — пиковая производительность нейроускорителя в INT8 по данным производителя чипа. Число камер — ориентир для типовых моделей детекции на видео 1080p. Точное значение зависит от модели и частоты кадров, мы проверяем его на пилоте.</p>
+    </div>
+  </section>
+
+  <!-- 3. КАК ЗАПУСКАЕМ -->
+  <section class="section" id="how">
+    <div class="container">
+      <header class="section__head">
+        <p class="kicker">От задачи до линии</p>
+        <h2>Железо — половина решения. Вторую половину делаем мы</h2>
+        <p class="section__sub">Вычислитель без обученной модели — просто плата. Ray подбирает железо, обучает модель на ваших данных и ставит готовую систему на линию.</p>
+      </header>
+      <ol class="flow">
+        <li class="flow__step">
+          <div class="flow__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg></div>
+          <span class="flow__n mono">01</span>
+          <h3>Разбираем задачу</h3>
+          <p>Сколько камер, какая скорость линии, что считать браком. Под это подбираем вычислитель — без запаса «на всякий случай».</p>
+        </li>
+        <li class="flow__arrow" aria-hidden="true"></li>
+        <li class="flow__step flow__step--ai">
+          <div class="flow__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4a3 3 0 0 0-3 3 3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 6 1V5a2 2 0 0 0-3-1zM15 4a3 3 0 0 1 3 3 3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-6 1"/></svg></div>
+          <span class="flow__n mono">02</span>
+          <h3>Обучаем модель</h3>
+          <p>На ваших фото и видео. Оптимизируем под выбранный нейроускоритель — RKNN для Rockchip, TensorRT для Jetson.</p>
+        </li>
+        <li class="flow__arrow" aria-hidden="true"></li>
+        <li class="flow__step">
+          <div class="flow__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <span class="flow__n mono">03</span>
+          <h3>Ставим на линию</h3>
+          <p>Монтаж у камеры или в шкаф, связь с отбраковщиком, сигнал оператору или выгрузка данных в вашу систему.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- Направления -->
+  <section class="section section--alt" id="directions">
+    <div class="container">
+      <header class="section__head">
+        <p class="kicker">Задачи, которые решают эти вычислители</p>
+        <h2>Что Ray делает лучше человека</h2>
+      </header>
+      <div class="dirs">
+        <a class="dir" href="index.html">
+          <span class="dir__n mono">01</span><h3>Детекция брака</h3>
+          <p>Трещины, сколы, царапины и некомплект — на каждой детали.</p><span class="dir__go">Пройти тест →</span>
+        </a>
+        <a class="dir" href="tracking.html">
+          <span class="dir__n mono">02</span><h3>Трекинг объектов</h3>
+          <p>ID и маршрут каждой единицы на конвейере — от входа до упаковки.</p><span class="dir__go">Пройти тест →</span>
+        </a>
+        <a class="dir" href="motion.html">
+          <span class="dir__n mono">03</span><h3>Поиск движения</h3>
+          <p>Люди, предметы и животные в кадре — без ложных тревог от дождя и бликов.</p><span class="dir__go">Пройти тест →</span>
+        </a>
+        <a class="dir" href="counting.html">
+          <span class="dir__n mono">04</span><h3>Подсчёт объектов</h3>
+          <p>Точный счёт продукции по типам и цветам в реальном времени.</p><span class="dir__go">Пройти тест →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ФОРМА -->
+  <section class="section section--cta" id="form">
+    <div class="container form-grid">
+      <div class="form-copy">
+        <p class="kicker">Бесплатно и без обязательств</p>
+        <h2>Подберём вычислитель под вашу задачу</h2>
+        <p class="lead">Расскажите, что нужно видеть и сколько камер на линии. Предложим решение и проверим его на ваших данных до покупки железа.</p>
+        <ol class="steps">
+          <li><b>Оставьте заявку</b> — перезвоним в течение рабочего дня.</li>
+          <li><b>Пришлите фото или видео</b> с линии — можно с телефона.</li>
+          <li><b>Получите расчёт</b>: какой вычислитель, сколько камер и что модель находит на ваших кадрах.</li>
+        </ol>
+      </div>
+      <form class="lead-form" id="lead-form" novalidate>
+        <div class="field">
+          <label for="f-name">Имя</label>
+          <input id="f-name" name="name" type="text" autocomplete="name" required placeholder="Как к вам обращаться">
+        </div>
+        <div class="field">
+          <label for="f-phone">Телефон</label>
+          <input id="f-phone" name="phone" type="tel" autocomplete="tel" required placeholder="+7 (___) ___-__-__" inputmode="tel">
+        </div>
+        <div class="field">
+          <label for="f-link">Ссылка на фото/видео производства <span class="opt">необязательно</span></label>
+          <input id="f-link" name="link" type="url" placeholder="Яндекс Диск, Google Drive, облако…">
+        </div>
+        <input type="hidden" name="direction" value="Вычислители">
+        <input type="hidden" name="calc" id="f-calc">
+        <p class="calc-attached" id="f-calc-note" hidden></p>
+        <label class="check">
+          <input type="checkbox" name="consent" required>
+          <span>Согласен на <a href="#" target="_blank" rel="noopener">обработку персональных данных</a></span>
+        </label>
+        <button class="btn btn--primary btn--lg btn--block" type="submit">Подобрать вычислитель</button>
+        <p class="form-msg" id="f-msg" role="status"></p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="partners" aria-label="Партнёры и клиенты">
+      <p>Нам доверяют</p>
+      <ul>
+        <li><span class="plogo">ЛОГОТИП</span></li>
+        <li><span class="plogo">ЛОГОТИП</span></li>
+        <li><span class="plogo">ЛОГОТИП</span></li>
+        <li><span class="plogo">ЛОГОТИП</span></li>
+        <li><span class="plogo">ЛОГОТИП</span></li>
+      </ul>
+    </div>
+    <div class="footer__grid">
+      <div>
+        <a class="logo logo--footer" href="#top"><img src="assets/ray_logo_rus.svg" alt="Ray" width="118" height="44"></a>
+        <p class="footer__muted">Машинное зрение для контроля качества на производстве.</p>
+      </div>
+      <div>
+        <p class="footer__h">Контакты</p>
+        <p><a href="tel:+70000000000">+7 (000) 000‑00‑00</a></p>
+        <p><a href="mailto:hello@example.com">hello@example.com</a></p>
+        <p class="footer__muted">Москва, ул. Примерная, 1</p>
+      </div>
+      <div>
+        <p class="footer__h">Соцсети</p>
+        <ul class="socials">
+          <li><a href="#" aria-label="Telegram">Telegram</a></li>
+          <li><a href="#" aria-label="ВКонтакте">ВКонтакте</a></li>
+          <li><a href="#" aria-label="YouTube">YouTube</a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="footer__copy">© <span id="year">2026</span> Ray. Все расчёты на сайте носят оценочный характер.</p>
+  </div>
+</footer>
+
+<script src="common.js" defer></script>
+<script src="hardware.js" defer></script>
+</body>
+</html>
