@@ -54,13 +54,13 @@
       <div class="hero__text">
         <p class="kicker">Вычислители для машинного зрения</p>
         <h1>Своё железо под <em class="em-ai">каждую задачу</em> машинного зрения</h1>
-        <p class="lead">Четыре мини‑компьютера с нейроускорителями. Нейросеть работает прямо у линии: без облака, без отправки видео наружу и без абонентской платы.</p>
+        <p class="lead">Четыре мини‑компьютера с нейроускорителями. Нейросеть работает прямо у линии: без облака, без потерь времени и без сбоев интернета.</p>
         <div class="hero__cta">
           <a class="btn btn--primary btn--lg" href="#devices">Смотреть решения</a>
           <a class="btn btn--ghost btn--lg" href="#form">Подобрать под задачу</a>
         </div>
         <ul class="hero__facts">
-          <li><b>3–117</b> TOPS</li>
+          <li><b>3–117</b> <a class="tops-link" href="#tops">TOPS</a> — трлн операций ИИ в секунду</li>
           <li><b>от 4 479 ₽</b> за вычислитель</li>
           <li><b>0 ₽</b> за облако</li>
         </ul>
@@ -90,6 +90,7 @@
           <span class="picker__label">Решение</span>
           <b class="picker__name" id="picker-name">Orange Pi 4 Pro</b>
           <span class="picker__nums mono"><span id="picker-tops">3 TOPS</span><span id="picker-price">4 479 ₽</span></span>
+          <span class="picker__unit" id="picker-unit">3 TOPS = 3 трлн операций нейросети в секунду</span>
           <span class="picker__go">Подробнее ↓</span>
         </a>
       </div>
@@ -104,6 +105,21 @@
         <h2>Под каждый масштаб задачи — свой вычислитель</h2>
         <p class="section__sub">Здесь нет «лучше» и «хуже». Датчику на одной камере не нужен GPU за 80 тысяч, а видеоаналитику цеха не потянет плата за 4 тысячи. Выбираем то, что закрывает вашу задачу без переплаты.</p>
       </header>
+
+      <aside class="tops" id="tops" aria-labelledby="tops-title">
+        <div class="tops__word" aria-hidden="true">
+          <div><b>T</b><span>Tera</span><small>триллион</small></div>
+          <div><b>O</b><span>Operations</span><small>операций</small></div>
+          <div><b>P</b><span>Per</span><small>в</small></div>
+          <div><b>S</b><span>Second</span><small>секунду</small></div>
+        </div>
+        <div class="tops__text">
+          <h3 id="tops-title">Что такое TOPS</h3>
+          <p><b>TOPS — Tera Operations Per Second</b>, «тера‑операций в секунду»: сколько триллионов простых операций нейросети вычислитель выполняет за одну секунду. 1 TOPS — это 1 000 000 000 000 операций в секунду.</p>
+          <p>Нейросеть, которая ищет брак на кадре, — это миллиарды умножений и сложений. Чем больше TOPS, тем больше камер, кадров в секунду и тем более тяжёлые модели вычислитель обрабатывает одновременно. Поэтому TOPS здесь — мера масштаба задачи, а не оценка «хуже‑лучше».</p>
+          <p class="tops__fine">Производители указывают пиковое значение для формата INT8 — 8‑битных целых чисел, в которые сжимают нейросеть для быстрой работы. Реальная скорость зависит от модели, поэтому мы проверяем её на пилоте.</p>
+        </div>
+      </aside>
 
       <!-- 01. Orange Pi 4 Pro -->
       <article class="hw" id="hw-opi" data-name="Orange Pi 4 Pro" data-tops="3 TOPS" data-price="4 479 ₽">
@@ -129,13 +145,13 @@
             <text x="170" y="146" class="svg-mono" font-size="14" font-weight="700" fill="#e8edf3" text-anchor="middle">A733</text>
             <text x="170" y="166" class="svg-mono" font-size="10" fill="#2ee6a8" text-anchor="middle">NPU</text>
           </svg>
-          <figcaption class="hw__badge mono"><b>3</b> TOPS</figcaption>
+          <figcaption class="hw__badge mono"><b>3</b> <abbr title="Tera Operations Per Second — триллионов операций в секунду">TOPS</abbr><small>трлн операций/с</small></figcaption>
         </figure>
         <div class="hw__body">
           <p class="hw__task"><span class="mono">01</span> Точечный контроль на одной камере</p>
           <h3>Orange Pi 4 Pro <span class="hw__cfg">4 ГБ</span></h3>
           <div class="hw__nums">
-            <div><span>Производительность NPU</span><b class="mono">3 TOPS</b></div>
+            <div><span>Производительность NPU</span><b class="mono">3 TOPS</b><small>3 трлн операций в секунду · <a href="#tops">что такое TOPS?</a></small></div>
             <div><span>Цена на AliExpress</span><b class="mono">4 479 ₽</b></div>
           </div>
           <p class="hw__lead">Одна точка контроля — один вопрос: есть деталь или нет, наклеена ли этикетка, закрыта ли крышка, сколько единиц прошло. Плата размером 89×56 мм ставится прямо у камеры, а с модулем PoE к ней тянется один сетевой кабель.</p>
@@ -146,7 +162,7 @@
           </ul>
           <dl class="hw__specs">
             <div><dt>Процессор</dt><dd>Allwinner A733: 2× Cortex‑A76 + 6× Cortex‑A55</dd></div>
-            <div><dt>Нейроускоритель</dt><dd>NPU до 3 TOPS (INT8)</dd></div>
+            <div><dt>Нейроускоритель</dt><dd>NPU до 3 <abbr title="Tera Operations Per Second — триллионов операций в секунду">TOPS</abbr> — 3 трлн операций в секунду (INT8)</dd></div>
             <div><dt>Память</dt><dd>4 ГБ LPDDR5, слот M.2 NVMe, microSD</dd></div>
             <div><dt>Камеры</dt><dd>2× MIPI CSI или USB‑камера</dd></div>
             <div><dt>Связь</dt><dd>Gigabit Ethernet (PoE — доп. модуль), Wi‑Fi 6, Bluetooth 5.4</dd></div>
@@ -160,6 +176,7 @@
           <div class="hw__cta">
             <a class="btn btn--primary" href="#form" data-device="Orange Pi 4 Pro">Обсудить задачу</a>
             <a class="btn btn--ghost" href="https://aliexpress.ru/item/1005012979856352.html?sku_id=12000059935338441" target="_blank" rel="noopener sponsored">Открыть на AliExpress ↗</a>
+            <a class="btn btn--ghost" href="https://www.ozon.ru/product/orange-pi-orangepi4-pro-sovet-po-razvitiyu-allwinner-a733-vosmiyadernyy-wi-fi-bluetooth-lpddr5-3599303622/?at=1pSp1MPtFkwvl-cNHYXi9-Rg9Z-p-1K1&amp;sh=OEuk-eLs0w" target="_blank" rel="noopener sponsored">Открыть на Ozon ↗</a>
           </div>
         </div>
       </article>
@@ -190,13 +207,13 @@
             </g>
             <g class="svg-mono" font-size="9" fill="#2ee6a8"><text x="8" y="115">CAM 1</text><text x="8" y="145">CAM 2</text><text x="8" y="175">CAM 3</text><text x="8" y="205">CAM 4</text></g>
           </svg>
-          <figcaption class="hw__badge mono"><b>6</b> TOPS</figcaption>
+          <figcaption class="hw__badge mono"><b>6</b> <abbr title="Tera Operations Per Second — триллионов операций в секунду">TOPS</abbr><small>трлн операций/с</small></figcaption>
         </figure>
         <div class="hw__body">
           <p class="hw__task"><span class="mono">02</span> Видеоаналитика поста: несколько камер</p>
           <h3>Плата RK3576 <span class="hw__cfg">4 ГБ / 32 ГБ eMMC, в корпусе</span></h3>
           <div class="hw__nums">
-            <div><span>Производительность NPU</span><b class="mono">6 TOPS</b></div>
+            <div><span>Производительность NPU</span><b class="mono">6 TOPS</b><small>6 трлн операций в секунду · <a href="#tops">что такое TOPS?</a></small></div>
             <div><span>Цена на AliExpress</span><b class="mono">12 242 ₽</b></div>
           </div>
           <p class="hw__lead">Аппаратный видеодекодер принимает потоки с нескольких IP‑камер, а NPU прогоняет по ним детекцию. Решение для поста, где 2–4 камеры смотрят с разных ракурсов, а задача — найти, посчитать, проследить. Плата приходит в корпусе и со встроенной памятью: распаковали, прошили, поставили в шкаф.</p>
@@ -207,7 +224,7 @@
           </ul>
           <dl class="hw__specs">
             <div><dt>Процессор</dt><dd>Rockchip RK3576: 4× Cortex‑A72 + 4× Cortex‑A53</dd></div>
-            <div><dt>Нейроускоритель</dt><dd>NPU 6 TOPS (INT8), инструменты RKNN</dd></div>
+            <div><dt>Нейроускоритель</dt><dd>NPU 6 <abbr title="Tera Operations Per Second — триллионов операций в секунду">TOPS</abbr> — 6 трлн операций в секунду (INT8), инструменты RKNN</dd></div>
             <div><dt>Видео</dt><dd>Аппаратный декод до 8K, кодирование до 4K, GPU Mali‑G52</dd></div>
             <div><dt>Память</dt><dd>4 ГБ ОЗУ, 32 ГБ eMMC</dd></div>
             <div><dt>Связь</dt><dd>Ethernet, Wi‑Fi 6 (2,4/5 ГГц), Bluetooth 5.2</dd></div>
@@ -222,6 +239,7 @@
           <div class="hw__cta">
             <a class="btn btn--primary" href="#form" data-device="Плата RK3576">Обсудить задачу</a>
             <a class="btn btn--ghost" href="https://aliexpress.ru/item/1005010537044591.html?sku_id=12000052741966265" target="_blank" rel="noopener sponsored">Открыть на AliExpress ↗</a>
+            <a class="btn btn--ghost" href="https://market.yandex.ru/card/dlya-platy-razrabotki-ai-rk3576-octa-core-alot-processor-c/5812069448?do-waremd5=JI9It0g0mMq9OKY3wJbVLg&amp;nid=26912990&amp;ogV=373#fullSpecsAnchorId" target="_blank" rel="noopener sponsored">Открыть на Яндекс Маркете ↗</a>
           </div>
         </div>
       </article>
@@ -253,13 +271,13 @@
             <text x="40" y="150" class="svg-mono" font-size="9" fill="#6f8fb8" text-anchor="middle" transform="rotate(-90 40 146)">SSD 256</text>
             <path d="M60 145h10" stroke="#24456b" stroke-width="3"/>
           </svg>
-          <figcaption class="hw__badge mono"><b>67</b> TOPS</figcaption>
+          <figcaption class="hw__badge mono"><b>67</b> <abbr title="Tera Operations Per Second — триллионов операций в секунду">TOPS</abbr><small>трлн операций/с</small></figcaption>
         </figure>
         <div class="hw__body">
           <p class="hw__task"><span class="mono">03</span> Детекция брака в реальном времени</p>
           <h3>NVIDIA Jetson Orin Nano Super <span class="hw__cfg">8 ГБ, комплект AI Large Model Kit</span></h3>
           <div class="hw__nums">
-            <div><span>Производительность ИИ</span><b class="mono">67 TOPS</b></div>
+            <div><span>Производительность ИИ</span><b class="mono">67 TOPS</b><small>67 трлн операций в секунду · <a href="#tops">что такое TOPS?</a></small></div>
             <div><span>Цена на AliExpress</span><b class="mono">65 622 ₽</b></div>
           </div>
           <p class="hw__lead">Для задач, где нужна тяжёлая модель и точность до пикселя: сегментация трещин, сколов и царапин на каждой детали в потоке. Внутри полноценный GPU NVIDIA с CUDA и TensorRT — те же инструменты, что на серверах, поэтому обученная модель переносится без переделки. Комплект готов к пилоту из коробки: камера, SSD с системой, корпус.</p>
@@ -271,7 +289,7 @@
           <dl class="hw__specs">
             <div><dt>GPU</dt><dd>NVIDIA Ampere: 1024 ядра CUDA, 32 тензорных ядра</dd></div>
             <div><dt>Процессор</dt><dd>6× Arm Cortex‑A78AE</dd></div>
-            <div><dt>ИИ</dt><dd>67 TOPS (INT8, режим Super)</dd></div>
+            <div><dt>ИИ</dt><dd>67 <abbr title="Tera Operations Per Second — триллионов операций в секунду">TOPS</abbr> — 67 трлн операций в секунду (INT8, режим Super)</dd></div>
             <div><dt>Память</dt><dd>8 ГБ LPDDR5, 102 ГБ/с; SSD 256 ГБ</dd></div>
             <div><dt>Камеры</dt><dd>2× MIPI CSI‑2, USB, IP‑камеры по сети</dd></div>
             <div><dt>Ориентир</dt><dd>2–4 камеры с детекцией, сегментацией и трекингом</dd></div>
@@ -324,13 +342,13 @@
             <circle cx="200" cy="164" r="10" fill="#0d1117" stroke="#2ee6a8"/>
             <text x="200" y="220" class="svg-mono" font-size="11" font-weight="700" fill="#e8edf3" text-anchor="middle">ORIN NX</text>
           </svg>
-          <figcaption class="hw__badge mono"><b>117</b> TOPS</figcaption>
+          <figcaption class="hw__badge mono"><b>117</b> <abbr title="Tera Operations Per Second — триллионов операций в секунду">TOPS</abbr><small>трлн операций/с</small></figcaption>
         </figure>
         <div class="hw__body">
           <p class="hw__task"><span class="mono">04</span> Центр видеоаналитики участка</p>
           <h3>NVIDIA Jetson Orin NX Super <span class="hw__cfg">8 ГБ, комплект AI Large Model Kit</span></h3>
           <div class="hw__nums">
-            <div><span>Производительность ИИ</span><b class="mono">117 TOPS</b></div>
+            <div><span>Производительность ИИ</span><b class="mono">117 TOPS</b><small>117 трлн операций в секунду · <a href="#tops">что такое TOPS?</a></small></div>
             <div><span>Цена на AliExpress</span><b class="mono">82 595 ₽</b></div>
           </div>
           <p class="hw__lead">Один вычислитель на участок или цех: 6–8 камер и каскад моделей, которые работают одновременно — найти объект, классифицировать дефект, прочитать маркировку. Остаётся запас, чтобы рядом с видеоаналитикой работала локальная визуально‑языковая модель: оператор спрашивает текстом или голосом, что произошло на линии.</p>
@@ -342,7 +360,7 @@
           <dl class="hw__specs">
             <div><dt>GPU</dt><dd>NVIDIA Ampere: 1024 ядра CUDA, 32 тензорных ядра</dd></div>
             <div><dt>Процессор</dt><dd>6× Arm Cortex‑A78AE, до 2 ГГц</dd></div>
-            <div><dt>ИИ</dt><dd>117 TOPS (INT8, режим Super), ускоритель NVDLA</dd></div>
+            <div><dt>ИИ</dt><dd>117 <abbr title="Tera Operations Per Second — триллионов операций в секунду">TOPS</abbr> — 117 трлн операций в секунду (INT8, режим Super), ускоритель NVDLA</dd></div>
             <div><dt>Память</dt><dd>8 ГБ LPDDR5, 102 ГБ/с; SSD 256 ГБ</dd></div>
             <div><dt>Камеры</dt><dd>2× MIPI CSI‑2, USB, IP‑камеры по сети</dd></div>
             <div><dt>Ориентир</dt><dd>6–8 потоков 1080p, несколько моделей одновременно</dd></div>
@@ -372,7 +390,7 @@
         </div>
       </article>
 
-      <p class="hw__note">Цены — с AliExpress на 26 октября 2026 года, без доставки, для указанной комплектации. Продавец может их изменить. TOPS — пиковая производительность нейроускорителя в INT8 по данным производителя чипа. Число камер — ориентир для типовых моделей детекции на видео 1080p. Точное значение зависит от модели и частоты кадров, мы проверяем его на пилоте.</p>
+      <p class="hw__note">Цены — с AliExpress на 26 октября 2026 года, без доставки, для указанной комплектации. Продавец может их изменить. TOPS (Tera Operations Per Second — триллионов операций в секунду) — пиковая производительность нейроускорителя в INT8 по данным производителя чипа. Число камер — ориентир для типовых моделей детекции на видео 1080p. Точное значение зависит от модели и частоты кадров, мы проверяем его на пилоте.</p>
     </div>
   </section>
 

@@ -11,6 +11,8 @@ function initPicker() {
     res.href = '#' + card.id;
     $('#picker-name').textContent = card.dataset.name;
     $('#picker-tops').textContent = card.dataset.tops;
+    const tops = parseInt(card.dataset.tops, 10);
+    $('#picker-unit').textContent = `${tops} TOPS = ${tops} трлн операций нейросети в секунду`;
     $('#picker-price').textContent = card.dataset.price;
     res.classList.remove('is-flash');
     void res.offsetWidth; // перезапуск анимации

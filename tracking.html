@@ -65,19 +65,19 @@
       <header class="section__head">
         <p class="kicker">Интерактивный тест · 3 раунда</p>
         <h2>Уследите за коробкой на конвейере</h2>
-        <p class="section__sub">Запомните коробку в <b>жёлтой рамке</b>. Коробки одинаковые и будут меняться рядами. Когда лента остановится — нажмите на свою.</p>
+        <p class="section__sub">Запомните коробки в <b>жёлтых рамках</b>: в первом раунде одну, во втором — две, в третьем — три. Коробки одинаковые и будут меняться рядами. Когда лента остановится — нажмите на свои.</p>
       </header>
       <div class="game" id="game">
         <div class="game__bar">
           <div class="stat"><span class="stat__label">Раунд</span><span class="stat__value mono" id="g-round">1/3</span></div>
           <div class="stat"><span class="stat__label">Перестановок</span><span class="stat__value mono" id="g-swaps">0</span></div>
-          <div class="stat"><span class="stat__label">Угадано</span><span class="stat__value mono" id="g-score">0</span></div>
+          <div class="stat"><span class="stat__label">Угадано</span><span class="stat__value mono" id="g-score">0/6</span></div>
         </div>
         <div class="stage" id="stage">
           <canvas id="g-canvas" width="960" height="540" aria-label="Конвейер с коробками"></canvas>
           <div class="board__start" id="g-start">
             <p class="board__start-title">Сможете не упустить коробку?</p>
-            <p class="board__start-sub">3 раунда, с каждым — быстрее и больше перестановок</p>
+            <p class="board__start-sub">3 раунда: следите за одной, двумя, а затем тремя коробками</p>
             <button class="btn btn--primary btn--lg" id="g-start-btn" type="button">Начать тест</button>
           </div>
         </div>
@@ -85,8 +85,8 @@
         <div class="game__actions"><button class="btn btn--primary" id="g-next" type="button" hidden>Следующий раунд →</button></div>
         <div class="result" id="g-result" hidden aria-live="polite">
           <div class="result__score">
-            <div class="score score--human"><span>Ваш результат</span><b class="mono" id="r-human">2/3</b></div>
-            <div class="score score--ai"><span>Результат ИИ</span><b class="mono">3/3</b></div>
+            <div class="score score--human"><span>Ваш результат</span><b class="mono" id="r-human">4/6</b></div>
+            <div class="score score--ai"><span>Результат ИИ</span><b class="mono">6/6</b></div>
           </div>
           <p class="result__copy" id="r-copy"></p>
           <p class="result__extra" id="r-extra"></p>

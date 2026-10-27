@@ -63,27 +63,30 @@ function aiFrame(ctx, x, y, color, label, fg = '#06281d') {
   if (label) tag(ctx, x - s / 2, y - s / 2, label, color, fg, 12);
 }
 
-/* ================= Игра: уследите за коробкой ================= */
+/* ================= Игра: уследите за коробками ================= */
+// targets — сколько коробок нужно отследить в раунде
 const ROUNDS = [
-  { cols: 3, boxes: 6, swaps: 5, dur: 6.5, swapT: 0.75 },
-  { cols: 4, boxes: 8, swaps: 8, dur: 7.5, swapT: 0.6 },
-  { cols: 4, boxes: 10, swaps: 12, dur: 8.5, swapT: 0.5 },
+  { cols: 3, boxes: 6, swaps: 5, dur: 6.5, swapT: 0.75, targets: 1 },
+  { cols: 4, boxes: 8, swaps: 7, dur: 8, swapT: 0.65, targets: 2 },
+  { cols: 4, boxes: 9, swaps: 8, dur: 9, swapT: 0.6, targets: 3 },
 ];
+const TOTAL_TARGETS = ROUNDS.reduce((a, r) => a + r.targets, 0);
 const START_X = 50, COL_GAP = 95, TRAVEL = 500, SWAP_FROM = 0.9;
 
 function buildRound(cfg) {
   const slots = shuffle([...Array(cfg.cols * 3).keys()]).slice(0, cfg.boxes);
   const boxes = slots.map((s, k) => ({ id: k + 1, col: Math.floor(s / 3), lane: s % 3, startLane: s % 3, moves: [] }));
-  const target = pick(boxes);
+  const targets = shuffle([...boxes]).slice(0, cfg.targets);
   const slot = (cfg.dur - SWAP_FROM - 0.6) / cfg.swaps;
   const swapEnds = [];
   for (let k = 0; k < cfg.swaps; k++) {
     const t0 = SWAP_FROM + k * slot + rand(0, Math.max(0, slot - cfg.swapT));
     const t1 = t0 + cfg.swapT;
-    // Чаще перемешиваем колонку с «вашей» коробкой
-    const col = Math.random() < 0.6 ? target.col : pick(boxes).col;
+    // Чаще перемешиваем колонки с «вашими» коробками
+    const col = Math.random() < 0.6 ? pick(targets).col : pick(boxes).col;
     const inCol = boxes.filter((b) => b.col === col);
-    const a = inCol.includes(target) && Math.random() < 0.6 ? target : pick(inCol);
+    const mine = inCol.filter((b) => targets.includes(b));
+    const a = mine.length && Math.random() < 0.6 ? pick(mine) : pick(inCol);
     const toLane = pick([0, 1, 2].filter((l) => l !== a.lane));
     const b = inCol.find((x) => x.lane === toLane);
     const side = Math.random() < 0.5 ? 1 : -1;
@@ -95,7 +98,7 @@ function buildRound(cfg) {
     a.lane = toLane;
     swapEnds.push(t1);
   }
-  return { cfg, boxes, target, swapEnds, v: TRAVEL / cfg.dur };
+  return { cfg, boxes, targets, swapEnds, v: TRAVEL / cfg.dur };
 }
 
 function boxPos(round, b, t) {
@@ -122,9 +125,14 @@ function initTrackingGame() {
   const result = $('#g-result');
 
   let state = 'idle', ri = 0, round = buildRound(ROUNDS[0]), t = 0, phaseStart = 0, score = 0;
-  let picked = null, results = [];
+  let picked = new Set(), results = [];
 
   const setStatus = (text, kind = '') => { status.textContent = text; status.className = 'status' + (kind ? ' status--' + kind : ''); };
+  const need = () => round.cfg.targets;
+  const boxesWord = (n) => plural(n, ['коробку', 'коробки', 'коробок']);
+  const pickStatus = () => (need() === 1
+    ? 'Лента остановилась. Где ваша коробка? Нажмите на неё'
+    : `Лента остановилась. Найдите свои ${need()} ${boxesWord(need())}: выбрано ${picked.size} из ${need()}`);
 
   function render(now = 0) {
     drawBelt(ctx, round.v * Math.min(t, round.cfg.dur));
@@ -133,37 +141,53 @@ function initTrackingGame() {
     drawShadow(ctx);
 
     if (state === 'intro') {
-      const [x, y] = pos.get(round.target);
       ctx.globalAlpha = 0.6 + 0.4 * Math.sin(now / 120);
-      aiFrame(ctx, x, y, '#ffb020', 'СЛЕДИТЕ', '#1a1200');
+      round.targets.forEach((b) => {
+        const [x, y] = pos.get(b);
+        aiFrame(ctx, x, y, '#ffb020', 'СЛЕДИТЕ', '#1a1200');
+      });
       ctx.globalAlpha = 1;
     }
 
+    if (state === 'pick') {
+      picked.forEach((b) => {
+        const [x, y] = pos.get(b);
+        aiFrame(ctx, x, y, '#e8edf3', 'ВЫБОР', '#0b0e13');
+      });
+    }
+
     if (state === 'reveal') {
-      // Траектория вашей коробки — так её «запомнил» ИИ
+      // Траектории ваших коробок — так их «запомнил» ИИ
       ctx.strokeStyle = 'rgba(255,176,32,.9)';
       ctx.lineWidth = 3;
-      ctx.beginPath();
-      for (let s = 0; s <= round.cfg.dur + 0.001; s += 0.04) {
-        const [x, y] = boxPos(round, round.target, s);
-        s === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-      const [sx, sy] = boxPos(round, round.target, 0);
       ctx.fillStyle = '#ffb020';
-      ctx.beginPath(); ctx.arc(sx, sy, 6, 0, Math.PI * 2); ctx.fill();
+      round.targets.forEach((tb) => {
+        ctx.beginPath();
+        for (let s = 0; s <= round.cfg.dur + 0.001; s += 0.04) {
+          const [x, y] = boxPos(round, tb, s);
+          s === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        const [sx, sy] = boxPos(round, tb, 0);
+        ctx.beginPath(); ctx.arc(sx, sy, 6, 0, Math.PI * 2); ctx.fill();
+      });
 
       pos.forEach(([x, y], b) => {
-        if (b === round.target) aiFrame(ctx, x, y, '#ffb020', `ID ${pad2(b.id)} · ВАША`, '#1a1200');
+        if (round.targets.includes(b)) aiFrame(ctx, x, y, '#ffb020', `ID ${pad2(b.id)} · ВАША`, '#1a1200');
         else aiFrame(ctx, x, y, '#2ee6a8', `ID ${pad2(b.id)}`);
       });
-      if (picked && picked !== round.target) {
-        const [x, y] = pos.get(picked);
+      picked.forEach((b) => {
+        if (round.targets.includes(b)) return;
+        const [x, y] = pos.get(b);
         ctx.strokeStyle = '#ff4d4f';
         ctx.lineWidth = 4;
         ctx.strokeRect(x - 40, y - 40, 80, 80);
-        tag(ctx, x - 40, y + 58, 'ВАШ ВЫБОР', '#ff4d4f', '#fff', 12);
-      }
+        // Крест вместо подписи — подпись налезала на ярлыки соседних коробок
+        ctx.beginPath();
+        ctx.moveTo(x - 22, y - 22); ctx.lineTo(x + 22, y + 22);
+        ctx.moveTo(x + 22, y - 22); ctx.lineTo(x - 22, y + 22);
+        ctx.stroke();
+      });
       tag(ctx, 16, 40, `ИИ: ${round.boxes.length} треков из ${round.boxes.length} · 0 потерь`, '#2ee6a8', '#06281d', 14);
     }
   }
@@ -171,10 +195,10 @@ function initTrackingGame() {
   function frame(now) {
     if (state === 'intro') {
       t = 0;
-      if (now - phaseStart > 2000) {
+      if (now - phaseStart > 2000 + 800 * (need() - 1)) {
         state = 'run';
         phaseStart = now;
-        setStatus('Следите за ней…');
+        setStatus(need() === 1 ? 'Следите за ней…' : 'Следите за ними…');
       }
     } else if (state === 'run') {
       t = (now - phaseStart) / 1000;
@@ -183,7 +207,7 @@ function initTrackingGame() {
         t = round.cfg.dur;
         state = 'pick';
         stage.classList.add('is-clickable');
-        setStatus('Лента остановилась. Где ваша коробка? Нажмите на неё', 'warn');
+        setStatus(pickStatus(), 'warn');
       }
     }
     render(now);
@@ -193,33 +217,58 @@ function initTrackingGame() {
   function beginRound() {
     round = buildRound(ROUNDS[ri]);
     t = 0;
-    picked = null;
+    picked = new Set();
     state = 'intro';
     phaseStart = performance.now();
     $('#g-round').textContent = `${ri + 1}/${ROUNDS.length}`;
     $('#g-swaps').textContent = '0';
     nextBtn.hidden = true;
     stage.classList.remove('is-clickable');
-    setStatus('Запомните коробку в жёлтой рамке', 'warn');
+    setStatus(need() === 1 ? 'Запомните коробку в жёлтой рамке' : `Запомните ${need()} ${boxesWord(need())} в жёлтых рамках`, 'warn');
     requestAnimationFrame(frame);
+  }
+
+  function evaluate() {
+    const hits = [...picked].filter((b) => round.targets.includes(b)).length;
+    const n = need();
+    score += hits;
+    results.push({ hits, need: n, swaps: round.cfg.swaps });
+    $('#g-score').textContent = `${score}/${TOTAL_TARGETS}`;
+    state = 'reveal';
+    stage.classList.remove('is-clickable');
+    render();
+    const all = hits === n;
+    let text;
+    if (all) {
+      text = n === 1
+        ? `Верно! ИИ тоже не ошибся — и при этом помнит все ${round.boxes.length} коробок.`
+        : `Все ${n} верно! ИИ тоже не ошибся — и при этом помнит все ${round.boxes.length} коробок.`;
+    } else {
+      text = n === 1
+        ? 'Мимо. Ваша коробка — в жёлтой рамке, линия показывает её путь. ИИ не потерял ни одной.'
+        : `Угадано ${hits} из ${n}. Ваши коробки — в жёлтых рамках, линии показывают их путь. ИИ не потерял ни одной.`;
+    }
+    setStatus(text, all ? 'ai' : 'warn');
+    nextBtn.textContent = ri < ROUNDS.length - 1 ? 'Следующий раунд →' : 'Показать результат';
+    nextBtn.hidden = false;
   }
 
   function finish() {
     state = 'done';
     nextBtn.hidden = true;
     setStatus('');
-    const total = ROUNDS[ROUNDS.length - 1].boxes;
-    $('#r-human').textContent = `${score}/${ROUNDS.length}`;
-    let copy = score === ROUNDS.length
-      ? 'Вы уследили за коробкой во всех трёх раундах — отличная концентрация! ИИ сделал то же самое, но одновременно для каждой коробки на ленте.'
-      : `Вы уследили за коробкой в ${score} из ${ROUNDS.length} раундов. ИИ — во всех трёх, причём сразу за всеми ${total} коробками.`;
-    const miss = results.findIndex((r) => !r.ok);
+    $('#r-human').textContent = `${score}/${TOTAL_TARGETS}`;
+    let copy = score === TOTAL_TARGETS
+      ? 'Вы не потеряли ни одной коробки за три раунда — отличная концентрация! ИИ сделал то же самое, но одновременно для каждой коробки на ленте.'
+      : `Вы уследили за ${score} из ${TOTAL_TARGETS} коробок. ИИ — за всеми ${TOTAL_TARGETS}, причём одновременно со всеми остальными на ленте.`;
+    const miss = results.findIndex((r) => r.hits < r.need);
     if (miss >= 0) {
-      const n = results[miss].swaps;
-      copy += ` В раунде ${miss + 1} коробка потерялась после <b>${n} ${plural(n, ['перестановки', 'перестановок', 'перестановок'])}</b> — на линии сортировки это посылка, уехавшая не тому клиенту.`;
+      const { hits, need: n, swaps } = results[miss];
+      const lost = n - hits;
+      copy += ` В раунде ${miss + 1} вы потеряли ${lost} ${boxesWord(lost)} после <b>${swaps} ${plural(swaps, ['перестановки', 'перестановок', 'перестановок'])}</b> — на линии сортировки это ${lost === 1 ? 'посылка, уехавшая' : 'посылки, уехавшие'} не тому клиенту.`;
     }
     $('#r-copy').innerHTML = copy;
-    $('#r-extra').textContent = 'А на реальной линии таких коробок — сотни в минуту, и следить нужно за каждой, всю смену.';
+    $('#r-extra').textContent = 'Уже за тремя коробками следить в разы труднее. А на реальной линии их сотни в минуту — и следить нужно за каждой, всю смену.';
     result.hidden = false;
     result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
@@ -234,19 +283,11 @@ function initTrackingGame() {
       if (d < bestD) { best = b; bestD = d; }
     });
     if (!best) return;
-    picked = best;
-    const ok = best === round.target;
-    if (ok) score++;
-    results.push({ ok, swaps: round.cfg.swaps });
-    $('#g-score').textContent = score;
-    state = 'reveal';
-    stage.classList.remove('is-clickable');
+    // Повторный клик снимает выбор
+    if (picked.has(best)) picked.delete(best); else picked.add(best);
+    if (picked.size === need()) return evaluate();
     render();
-    setStatus(ok
-      ? `Верно! ИИ тоже не ошибся — и при этом помнит все ${round.boxes.length} коробок.`
-      : 'Мимо. Ваша коробка — в жёлтой рамке, линия показывает её путь. ИИ не потерял ни одной.', ok ? 'ai' : 'warn');
-    nextBtn.textContent = ri < ROUNDS.length - 1 ? 'Следующий раунд →' : 'Показать результат';
-    nextBtn.hidden = false;
+    setStatus(pickStatus(), 'warn');
   });
 
   nextBtn.addEventListener('click', () => {
@@ -260,12 +301,13 @@ function initTrackingGame() {
 
   $('#g-again').addEventListener('click', () => {
     ri = 0; score = 0; results = [];
-    $('#g-score').textContent = '0';
+    $('#g-score').textContent = `0/${TOTAL_TARGETS}`;
     result.hidden = true;
     beginRound();
     $('#game').scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 
+  $('#g-score').textContent = `0/${TOTAL_TARGETS}`;
   render();
 }
 
